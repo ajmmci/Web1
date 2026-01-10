@@ -93,8 +93,35 @@ document.addEventListener("DOMContentLoaded", function() {
       })
       .catch(() => { alert("Erreur lors de l'envoi du formulaire."); });
   });
-});
 
+ // Slideréalisation
+/* ===== SLIDER REALISATIONS ===== */
+
+let slideIndex = 0;
+
+window.showSlide = function (index) {
+  const slidesContainer = document.querySelector("#Réalisation .slides");
+  const slides = document.querySelectorAll("#Réalisation .slide");
+
+  if (!slidesContainer || slides.length === 0) return;
+
+  if (index >= slides.length) slideIndex = 0;
+  if (index < 0) slideIndex = slides.length - 1;
+
+  slidesContainer.style.transform = `translateX(-${slideIndex * 100}%)`;
+};
+
+window.nextSlide = function () {
+  slideIndex++;
+  window.showSlide(slideIndex);
+};
+
+window.prevSlide = function () {
+  slideIndex--;
+  window.showSlide(slideIndex);
+};
+
+});
 
 
 
