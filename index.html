@@ -1,258 +1,469 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AJM Service</title>
-<link rel="stylesheet" href="styles.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AJM Service</title>
+    <link rel="stylesheet" href="styles.css" />
 
-<!-- JS -->
-<script src="index.js" defer></script>
-<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-<script>
-  (function(){ emailjs.init("tj78crzPN0_rmmjFS"); })();
-</script>
-</head>
+    <!-- JS -->
+    <script src="index.js" defer></script>
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script>
+      (function(){ emailjs.init("tj78crzPN0_rmmjFS"); })();
+    </script>
+  </head>
 
-<body>
-<header>
-  <div class="logo" onclick="showHome()">
-    <img src="https://i.ibb.co/0p6wZMf7/SCREEN-4.jpg" alt="Logo AJM Tune">
-     
-  </div>
-  <nav>
-    <ul>
-      <li><a href="#" onclick="toggleSection('Réalisation')">Réalisations</a></li>
-      <li><a href="#" onclick="toggleSection('services')">Prestations</a></li>
-      <li><a href="#" onclick="toggleSection('fileservice')">Demandes</a></li>
-      <li><a href="#" onclick="toggleSection('CGV')">CGV</a></li>
-    </ul>
-  </nav>
-</header>
+  <body>
+    <header>
+      <div class="logo" onclick="showHome()">
+        <img src="https://i.ibb.co/0p6wZMf7/SCREEN-4.jpg" alt="Logo AJM Tune" />
+      </div>
+      <nav>
+        <ul>
+          <li>
+            <a href="#" onclick="toggleSection('Réalisation')">Réalisations</a>
+          </li>
+          <li>
+            <a href="#" onclick="toggleSection('services')">Prestations</a>
+          </li>
+          <li>
+            <a href="#" onclick="toggleSection('fileservice')">Demandes</a>
+          </li>
+          <li><a href="#" onclick="toggleSection('CGV')">CGV</a></li>
+        </ul>
+      </nav>
+    </header>
 
-<section id="hero">
-  <h1>Bienvenue chez AJM Tune</h1>
-</section>
+    <section id="hero">
+      <h1>Bienvenue chez AJM Tune</h1>
+    </section>
 
-<section id="services" style="display:none;">
-  <h2>Nos Services</h2>
-  <ul>
-    
-    <li><a href="#" onclick="openPopupGO()">Réglage gestion ouverte / Calibration moteur</a></li>
-
-    <li>Installation ECU programmable</li>
-    
-    <li>Vente de pièces performances</li>
-    
-    <li>Diagnostic moteur</li>
-    
-    <li><a href="#" onclick="openPopupMS()">Ecu Siemens MS42/MS43/MS45 ImmoOff</a></li>
-  </ul>
-
-  <!-- Pop-up -->
-  <div id="textPopupMS" class="popup">
-    <div class="popup-content">
-      <span class="close-btn" onclick="closePopupMS()">&times;</span>
-      <h3>ECU Siemens MS42/MS43/MS45 – ImmoOff</h3>
-      <p style="text-align:center; font-size:0.9em;">(trouvé sur BMW M52TU et M54)</p>
-      <p>Pour votre véhicule swapé grâce à la <strong>désactivation de l’anti-démarrage (Immo)</strong></p>
-      <p>Nous intervenons sur un <strong>ECU fourni par vos soins</strong> ou sur un <strong>ECU acheté et vérifié en interne</strong>.</p>
+    <section id="services" style="display:none;">
+      <h2>Nos Services</h2>
       <ul>
-        <li>Calibration injecteurs</li>
-        <li>Décalage rupteur / Hardcut</li>
-        <li>Optimisation pour E85</li>
-        <li>Désactivation SAP - Sondes catalyseurs secondaires</li>
+        <li>
+          <a href="#" onclick="openPopupGO()"
+            >Réglage gestion ouverte / Calibration moteur</a
+          >
+        </li>
+
+        <li>Installation ECU programmable</li>
+
+        <li>Vente de pièces performances</li>
+
+        <li>Diagnostic moteur</li>
+
+        <li>
+          <a href="#" onclick="openPopupMS()"
+            >Ecu Siemens MS42/MS43/MS45 ImmoOff</a
+          >
+        </li>
       </ul>
-      <p>Intervention sur banc ou directement sur le véhicule, selon la configuration.</p>
+
+      <!-- Pop-up -->
+      <div id="textPopupMS" class="popup">
+        <div class="popup-content">
+          <span class="close-btn" onclick="closePopupMS()">&times;</span>
+          <h3>ECU Siemens MS42/MS43/MS45 – ImmoOff</h3>
+          <p style="text-align:center; font-size:0.9em;">
+            (trouvé sur BMW M52TU et M54)
+          </p>
+          <p>
+            Pour votre véhicule swapé grâce à la
+            <strong>désactivation de l’anti-démarrage (Immo)</strong>
+          </p>
+          <p>
+            Nous intervenons sur un <strong>ECU fourni par vos soins</strong> ou
+            sur un <strong>ECU acheté et vérifié en interne</strong>.
+          </p>
+          <ul>
+            <li>Calibration injecteurs</li>
+            <li>Décalage rupteur / Hardcut</li>
+            <li>Optimisation pour E85</li>
+            <li>Désactivation SAP - Sondes catalyseurs secondaires</li>
+          </ul>
+          <p>
+            Intervention sur banc ou directement sur le véhicule, selon la
+            configuration.
+          </p>
+        </div>
+      </div>
+
+      <div id="textPopupGO" class="popup">
+        <div class="popup-content">
+          <span class="close-btn" onclick="closePopupGO()">&times;</span>
+          <h3>Réglage gestion ouverte / Calibration moteur</h3>
+          <p style="text-align:center; font-size:0.7em;">
+            KDFI, MaxxECU, LinkECU, Motorsport Electronics...
+          </p>
+          <p>
+            Le travail peut aller d’une simple
+            <strong>cartographie de démarrage</strong> à un
+            <strong>accompagnement complet</strong> avec suivi du véhicule lors
+            de ses premiers roulages sur piste.
+          </p>
+          <p>
+            Les prestations comprennent l’ajustement des
+            <strong>tables de carburant et d’allumage</strong>, la gestion du
+            <strong>boost</strong>, ainsi que la configuration des
+            <strong>fonctions avancées</strong> (antilag, launch control,
+            corrections par température, etc.).
+          </p>
+          <p>
+            Chaque calibration est adaptée au montage et à l’utilisation du
+            véhicule, permettant d’affiner les réglages et d’assurer un
+            fonctionnement fiable et cohérent.
+          </p>
+          <p>
+            <em>Intervention possible sur banc ou directement sur piste.</em>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="fileservice" style="display:none;">
+      <h2>Comment profiter de notre expertise ?</h2>
+      <ul style="list-style:none;padding-left:0;">
+        <li>
+          Obtenez votre devis grâce au formulaire suivant :
+          <a href="#" onclick="openPopup()">ici</a>
+        </li>
+        <li>ou</li>
+        <li>
+          Laissez nous un message sur Instagram :
+          <a href="https://www.instagram.com/ajm_tune" target="_blank"
+            >ajm_tune</a
+          >
+        </li>
+      </ul>
+    </section>
+
+    <!-- Pop-up Form -->
+    <div id="popupForm" class="popup">
+      <div class="popup-content">
+        <span class="close-btn" onclick="closePopup()">&times;</span>
+        <h3>Formulaire de Demande</h3>
+        <form id="requestForm">
+          <div class="form-group">
+            <label for="firstname">Prénom :</label>
+            <input type="text" id="firstname" name="firstname" required />
+          </div>
+          <div class="form-group">
+            <label for="lastname">Nom :</label>
+            <input type="text" id="lastname" name="lastname" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email :</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="brand">Marque :</label>
+            <input type="text" id="brand" name="brand" required />
+          </div>
+          <div class="form-group">
+            <label for="model">Modèle :</label>
+            <input type="text" id="model" name="model" required />
+          </div>
+          <div class="form-group">
+            <label for="requestType">Type de demande :</label>
+            <select id="requestType" name="requestType" required>
+              <option value="" selected>Choisissez une option</option>
+              <option value="gestionOuverte">
+                Cartographie Gestion ouverte (300€)
+              </option>
+              <option value="200">Calculateur MS42/MS43/MS45 (200€)</option>
+              <option value="150">Diagnostic (150€)</option>
+              <option value="autre">Autre (0€)</option>
+            </select>
+          </div>
+
+          <!-- Gestion ouverte -->
+          <div
+            id="gestionOuverteOptions"
+            class="gestion-section"
+            style="display:none;"
+          >
+            <div class="form-group">
+              <label for="gestionBrand">Marque de la gestion ouverte :</label>
+              <input
+                type="text"
+                id="gestionBrand"
+                name="gestionBrand"
+                placeholder="Ex : MaxxEcu, Link, Motorsport Electronics, K-Data"
+              />
+            </div>
+            <div class="checkbox-group">
+              <label>
+                <input type="checkbox" id="rentBench" name="rentBench" />
+                Souhaitez-vous la location du banc ? (+250€)
+              </label>
+              <small class="note">1/2 journée sur Valence (26)</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description :</label>
+            <textarea
+              id="description"
+              name="description"
+              rows="4"
+              required
+            ></textarea>
+          </div>
+
+          <p id="estimatedPrice" class="price-display">Prix estimatif : --</p>
+
+          <div class="terms">
+            <label>
+              <input type="checkbox" id="acceptTerms" required />
+              Je comprends et accepte les
+              <a href="#" onclick="toggleSection('CGV')">CGV</a>.
+            </label>
+          </div>
+
+          <button type="submit">Envoyer la demande</button>
+          <p class="info-note">
+            * Les prix affichés sont donnés à titre indicatif et peuvent varier.
+          </p>
+        </form>
+      </div>
     </div>
-  </div>
 
-   <div id="textPopupGO" class="popup">
-  <div class="popup-content">
-    <span class="close-btn" onclick="closePopupGO()">&times;</span>
-    <h3>Réglage gestion ouverte / Calibration moteur</h3>
-    <p style="text-align:center; font-size:0.7em;">KDFI, MaxxECU, LinkECU, Motorsport Electronics...</p>
-    <p>Le travail peut aller d’une simple <strong>cartographie de démarrage</strong> à un <strong>accompagnement complet</strong> avec suivi du véhicule lors de ses premiers roulages sur piste.</p>
-    <p>Les prestations comprennent l’ajustement des <strong>tables de carburant et d’allumage</strong>, la gestion du <strong>boost</strong>, ainsi que la configuration des <strong>fonctions avancées</strong> (antilag, launch control, corrections par température, etc.).</p>
-    <p>Chaque calibration est adaptée au montage et à l’utilisation du véhicule, permettant d’affiner les réglages et d’assurer un fonctionnement fiable et cohérent.</p>
-    <p><em>Intervention possible sur banc ou directement sur piste.</em></p>
-  </div>
-</div>
-  
-</section>
+    <!-- Confirmation Pop-up -->
+    <div id="confirmationPopup" class="popup">
+      <div class="popup-content">
+        <span class="close-btn" onclick="closePopup()">&times;</span>
+        <h3>Demande envoyée !</h3>
+        <p>
+          Votre demande a bien été envoyée. Nous vous contacterons sous peu.
+        </p>
+      </div>
+    </div>
 
-<section id="fileservice" style="display:none;">
-  <h2>Comment profiter de notre expertise ?</h2>
-  <ul style="list-style:none;padding-left:0;">
-    <li>Obtenez votre devis grâce au formulaire suivant : <a href="#" onclick="openPopup()">ici</a></li>
-    <li>ou</li>
-    <li>Laissez nous un message sur Instagram : <a href="https://www.instagram.com/ajm_tune" target="_blank">ajm_tune</a></li>
-    
-  </ul>
-</section>
+    <section id="about" style="display:none;">
+      <h2>À propos</h2>
+      <p>Avec une expertise reconnue...</p>
+    </section>
 
-<!-- Pop-up Form -->
-<div id="popupForm" class="popup">
-  <div class="popup-content">
-    <span class="close-btn" onclick="closePopup()">&times;</span>
-    <h3>Formulaire de Demande</h3>
-    <form id="requestForm">
-      <div class="form-group">
-        <label for="firstname">Prénom :</label>
-        <input type="text" id="firstname" name="firstname" required>
-      </div>
-      <div class="form-group">
-        <label for="lastname">Nom :</label>
-        <input type="text" id="lastname" name="lastname" required>
-      </div>
-      <div class="form-group">
-        <label for="email">Email :</label>
-        <input type="email" id="email" name="email" required>
-      </div>
-      <div class="form-group">
-        <label for="brand">Marque :</label>
-        <input type="text" id="brand" name="brand" required>
-      </div>
-      <div class="form-group">
-        <label for="model">Modèle :</label>
-        <input type="text" id="model" name="model" required>
-      </div>
-      <div class="form-group">
-        <label for="requestType">Type de demande :</label>
-        <select id="requestType" name="requestType" required>
-          <option value="" selected>Choisissez une option</option>
-          <option value="gestionOuverte">Cartographie Gestion ouverte (300€)</option>
-          <option value="200">Calculateur MS42/MS43/MS45 (200€)</option>
-          <option value="150">Diagnostic (150€)</option>
-          <option value="autre">Autre (0€)</option>
-        </select>
-      </div>
+    <section id="CGV" style="display:none;">
+      <h1 style="color:darkblue;">Conditions Générales de Vente (CGV)</h1>
 
-      <!-- Gestion ouverte -->
-      <div id="gestionOuverteOptions" class="gestion-section" style="display:none;">
-        <div class="form-group">
-          <label for="gestionBrand">Marque de la gestion ouverte :</label>
-          <input type="text" id="gestionBrand" name="gestionBrand" placeholder="Ex : MaxxEcu, Link, Motorsport Electronics, K-Data">
+      <h3>1. Préambule</h3>
+      <p>
+        Les présentes Conditions Générales de Vente (CGV) régissent l’ensemble
+        des ventes de produits et services réalisées par AJM Service, ci-après
+        dénommée « le Prestataire », auprès de ses clients, ci-après dénommés «
+        le Client ». Toute commande implique l’adhésion pleine et entière du
+        Client aux présentes CGV, qui prévalent sur tout autre document.
+      </p>
+
+      <h3>2. Prestations proposées</h3>
+      <p>
+        Le Prestataire propose des services de reprogrammation moteur,
+        d’optimisation des performances véhiculaires, ainsi que des services
+        spécifiques liés à l’amélioration des véhicules. Les caractéristiques
+        essentielles des services sont présentées sur le site internet :
+        <strong>www.ajmmci.fr</strong>.
+      </p>
+
+      <h3>3. Commandes</h3>
+      <p>
+        Toute commande effectuée par le Client est considérée comme ferme et
+        définitive dès lors de sa validation par le Prestataire. Les commandes
+        peuvent être passées via le site internet ou directement auprès de nos
+        équipes. Le Prestataire se réserve le droit de refuser une commande en
+        cas de non-conformité ou d’incident précédent avec le Client.
+      </p>
+
+      <h3>4. Tarifs et paiements</h3>
+      <h4>4.1. Tarifs</h4>
+      <p>
+        Les prix des prestations sont indiqués en euros, toutes taxes comprises
+        (TTC). Le Prestataire se réserve le droit de modifier ses tarifs à tout
+        moment. Toutefois, le prix applicable sera celui en vigueur à la date de
+        la commande.
+      </p>
+
+      <h4>4.2. Modalités de paiement</h4>
+      <p>
+        Le paiement s’effectue comptant à la commande, sauf accord préalable
+        écrit. Les moyens de paiement acceptés sont : carte bancaire, virement
+        bancaire et espèces.
+      </p>
+      <p>
+        Pour les prestations incluant la location d’un banc à rouleaux, le
+        paiement devra s’effectuer en avance afin de réserver un créneau.
+      </p>
+
+      <h4>4.3. Retard de paiement</h4>
+      <p>
+        En cas de retard de paiement, des pénalités pourront être appliquées
+        conformément à la législation en vigueur. Le Prestataire pourra
+        également suspendre l’exécution des services jusqu’à régularisation.
+      </p>
+
+      <h3>5. Déroulement des prestations</h3>
+      <ul>
+        <li>
+          Les prestations sont réalisées sur rendez-vous, soit dans les locaux
+          du Prestataire, soit à l’endroit convenu avec le Client.
+        </li>
+        <li>
+          Le Client s’engage à fournir un véhicule en état de fonctionnement.
+          Toute intervention sur un véhicule présentant des défauts ou anomalies
+          pourra être refusée.
+        </li>
+        <li>
+          Le Prestataire met en œuvre tous les moyens raisonnables pour
+          atteindre les objectifs d’optimisation convenus avec le Client.
+          Toutefois, les résultats dépendent de multiples facteurs (type de
+          véhicule, état, entretien précédent, etc.), et le Prestataire ne peut
+          garantir un résultat précis.
+        </li>
+        <li>
+          Gestion moteur ouverte : Pour les systèmes de gestion moteur ouverts
+          (Link ECU, Megasquirt, etc.), le Prestataire assure l’installation, la
+          configuration et l’optimisation sur mesure. Le Client reconnaît que
+          ces systèmes nécessitent un suivi spécifique, et toute intervention
+          ultérieure pourra faire l’objet d’une facturation supplémentaire. En
+          cas de dépassement du forfait de base prévu, le temps de travail
+          additionnel sera facturé à l’heure, selon le tarif horaire en vigueur.
+        </li>
+      </ul>
+
+      <h3>6. Garantie et responsabilité</h3>
+      <p>
+        Le Prestataire garantit la conformité de ses prestations aux
+        règlementations en vigueur à la date de leur réalisation.
+      </p>
+      <p>
+        Le Client est informé que certaines modifications peuvent entraîner une
+        non-conformité du véhicule avec la réglementation routière en vigueur.
+        Le Prestataire ne pourra être tenu pour responsable des conséquences
+        juridiques ou administratives en cas d’usage non conforme.
+      </p>
+      <p>
+        Le Prestataire exclut toute responsabilité en cas de dommages indirects,
+        consécutifs ou immatériels.
+      </p>
+
+      <h4>6.1 Décharge de responsabilité spécifique aux interventions</h4>
+      <p>
+        Le Client reconnaît que les interventions réalisées par le Prestataire
+        (reprogrammation, optimisation moteur, calibration ECU, réglages sur
+        banc à rouleaux, etc.) comportent des risques inhérents liés à l’état du
+        véhicule et à son passif mécanique, qui peuvent entraîner des
+        défaillances indépendantes de la prestation.
+      </p>
+      <p>Le Prestataire n’est pas responsable de :</p>
+      <ul>
+        <li>
+          Toute casse mécanique (moteur, boîte, transmission, périphériques,
+          etc.) survenant pendant ou après l’intervention ;
+        </li>
+        <li>
+          Les dommages ou dysfonctionnements résultant de composants
+          antérieurement endommagés ou usés ;
+        </li>
+        <li>
+          Toute conséquence liée à un usage non conforme ou à une modification
+          ultérieure du véhicule.
+        </li>
+      </ul>
+      <p>
+        Le Client confirme avoir été informé de ces risques et accepte que le
+        Prestataire n’encourt aucune responsabilité au-delà du strict cadre de
+        la prestation réalisée.
+      </p>
+
+      <h3>7. Rétractation</h3>
+      <p>
+        Conformément à l’article L221-18 du Code de la consommation, le Client
+        bénéficie d’un délai de 14 jours pour exercer son droit de rétractation.
+        Ce droit ne s’applique toutefois pas aux prestations pleinement
+        exécutées avant la fin du délai, avec l’accord du Client. Pour exercer
+        ce droit, le Client doit contacter le Prestataire à l’adresse suivante :
+        <strong>ajmmciservice@gmail.com</strong>.
+      </p>
+
+      <h3>8. Règlement des litiges</h3>
+      <p>
+        En cas de litige, les parties s’engagent à rechercher une solution
+        amiable. À défaut, le litige sera soumis aux tribunaux compétents du
+        ressort du siège social du Prestataire.
+      </p>
+
+      <h3>9. Protection des données personnelles</h3>
+      <p>
+        Les données collectées sont nécessaires à la gestion des commandes et au
+        suivi des relations commerciales. Conformément au Règlement Général sur
+        la Protection des Données (RGPD), le Client dispose d’un droit d’accès,
+        de rectification et de suppression de ses données en contactant le
+        Prestataire à l’adresse suivante :
+        <strong>ajmmciservice@gmail.com</strong>. La durée de conservation des
+        données est de <strong>365 jours</strong>.
+      </p>
+
+      <h3>10. Acceptation des CGV</h3>
+      <p>
+        Le Client reconnaît avoir pris connaissance des présentes CGV et les
+        accepter sans réserve. Les CGV peuvent être modifiées à tout moment par
+        le Prestataire, et les modifications seront applicables à toute commande
+        postérieure à leur publication.
+      </p>
+    </section>
+
+    <section id="Réalisation" style="display:none;">
+      <h2>Voici quelques-unes de nos réalisations</h2>
+      <div class="slider">
+        <button class="arrow left" onclick="prevSlide()">&#10094;</button>
+
+        <div class="slides">
+          <div class="slide active">
+            <img src="https://i.ibb.co/wN6dwVyN/Capture-d-cran-10-1-2026-14621-1.jpg" alt="Photo 1" />
+            <p>Mazda MX5 NA 1.8 Turbo - TD04 - ME221</p>
+          </div>
+
+          <div class="slide">
+            <img src="https://i.ibb.co/JRQNq3vq/Bmw-330ci-3000-T-650gr-10-1-2026-143133-2.jpg" alt="Photo 2" />
+            <p>BMW 330ci E46 - Turbo - MaxxEcu Race - Carto Soft Rodage SP95</p>
+          </div>
+
+          <div class="slide">
+            <img src="https://i.ibb.co/X96h9Gv/Capture-d-cran-10-1-2026-142110-vovo.jpg"  alt="Photo 3" />
+            <p>Volvo 940 16s - Speeduino </p>
+          </div>
+
+          <div class="slide">
+          <img src="https://i.ibb.co/5HstY1p/Capture-d-cran-10-1-2026-13509-1.jpg" alt="Photo 4" />
+            <p>BMW 320d 150cv - Stg1 - "AbsOff LimpMode delete"</p>
+          </div>
         </div>
-        <div class="checkbox-group">
-          <label>
-            <input type="checkbox" id="rentBench" name="rentBench">
-            Souhaitez-vous la location du banc ? (+250€)
-          </label>
-          <small class="note">1/2 journée sur Valence (26)</small>
-        </div>
+
+        <button class="arrow right" onclick="nextSlide()">&#10095;</button>
       </div>
 
-      <div class="form-group">
-        <label for="description">Description :</label>
-        <textarea id="description" name="description" rows="4" required></textarea>
-      </div>
+      <a href="https://www.instagram.com/ajm_tune" target="_blank">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png"
+          alt="Instagram"
+          style="width:50px;height:50px;"
+        />
+      </a>
+      <p>Insta : ajm_tune</p>
+    </section>
 
-      <p id="estimatedPrice" class="price-display">Prix estimatif : --</p>
-
-      <div class="terms">
-        <label>
-          <input type="checkbox" id="acceptTerms" required>
-          Je comprends et accepte les <a href="#" onclick="toggleSection('CGV')">CGV</a>.
-        </label>
-      </div>
-
-      <button type="submit">Envoyer la demande</button>
-      <p class="info-note">* Les prix affichés sont donnés à titre indicatif et peuvent varier.</p>
-    </form>
-  </div>
-</div>
-
-<!-- Confirmation Pop-up -->
-<div id="confirmationPopup" class="popup">
-  <div class="popup-content">
-    <span class="close-btn" onclick="closePopup()">&times;</span>
-    <h3>Demande envoyée !</h3>
-    <p>Votre demande a bien été envoyée. Nous vous contacterons sous peu.</p>
-  </div>
-</div>
-
-<section id="about" style="display:none;">
-  <h2>À propos</h2>
-  <p>Avec une expertise reconnue...</p>
-</section>
-
-<section id="CGV" style="display:none;">
-<h1 style="color:darkblue;">Conditions Générales de Vente (CGV)</h1>
-
-<h3>1. Préambule</h3>
-<p>Les présentes Conditions Générales de Vente (CGV) régissent l’ensemble des ventes de produits et services réalisées par AJM Service, ci-après dénommée « le Prestataire », auprès de ses clients, ci-après dénommés « le Client ». Toute commande implique l’adhésion pleine et entière du Client aux présentes CGV, qui prévalent sur tout autre document.</p>
-
-<h3>2. Prestations proposées</h3>
-<p>Le Prestataire propose des services de reprogrammation moteur, d’optimisation des performances véhiculaires, ainsi que des services spécifiques liés à l’amélioration des véhicules. Les caractéristiques essentielles des services sont présentées sur le site internet : <strong>www.ajmmci.fr</strong>.</p>
-
-<h3>3. Commandes</h3>
-<p>Toute commande effectuée par le Client est considérée comme ferme et définitive dès lors de sa validation par le Prestataire. Les commandes peuvent être passées via le site internet ou directement auprès de nos équipes. Le Prestataire se réserve le droit de refuser une commande en cas de non-conformité ou d’incident précédent avec le Client.</p>
-
-<h3>4. Tarifs et paiements</h3>
-<h4>4.1. Tarifs</h4>
-<p>Les prix des prestations sont indiqués en euros, toutes taxes comprises (TTC). Le Prestataire se réserve le droit de modifier ses tarifs à tout moment. Toutefois, le prix applicable sera celui en vigueur à la date de la commande.</p>
-
-<h4>4.2. Modalités de paiement</h4>
-<p>Le paiement s’effectue comptant à la commande, sauf accord préalable écrit. Les moyens de paiement acceptés sont : carte bancaire, virement bancaire et espèces.</p>
-<p>Pour les prestations incluant la location d’un banc à rouleaux, le paiement devra s’effectuer en avance afin de réserver un créneau.</p>
-
-<h4>4.3. Retard de paiement</h4>
-<p>En cas de retard de paiement, des pénalités pourront être appliquées conformément à la législation en vigueur. Le Prestataire pourra également suspendre l’exécution des services jusqu’à régularisation.</p>
-
-<h3>5. Déroulement des prestations</h3>
-<ul>
-<li>Les prestations sont réalisées sur rendez-vous, soit dans les locaux du Prestataire, soit à l’endroit convenu avec le Client.</li>
-<li>Le Client s’engage à fournir un véhicule en état de fonctionnement. Toute intervention sur un véhicule présentant des défauts ou anomalies pourra être refusée.</li>
-<li>Le Prestataire met en œuvre tous les moyens raisonnables pour atteindre les objectifs d’optimisation convenus avec le Client. Toutefois, les résultats dépendent de multiples facteurs (type de véhicule, état, entretien précédent, etc.), et le Prestataire ne peut garantir un résultat précis.</li>
-<li>Gestion moteur ouverte : Pour les systèmes de gestion moteur ouverts (Link ECU, Megasquirt, etc.), le Prestataire assure l’installation, la configuration et l’optimisation sur mesure. Le Client reconnaît que ces systèmes nécessitent un suivi spécifique, et toute intervention ultérieure pourra faire l’objet d’une facturation supplémentaire. En cas de dépassement du forfait de base prévu, le temps de travail additionnel sera facturé à l’heure, selon le tarif horaire en vigueur.</li>
-</ul>
-
-<h3>6. Garantie et responsabilité</h3>
-<p>Le Prestataire garantit la conformité de ses prestations aux règlementations en vigueur à la date de leur réalisation.</p>
-<p>Le Client est informé que certaines modifications peuvent entraîner une non-conformité du véhicule avec la réglementation routière en vigueur. Le Prestataire ne pourra être tenu pour responsable des conséquences juridiques ou administratives en cas d’usage non conforme.</p>
-<p>Le Prestataire exclut toute responsabilité en cas de dommages indirects, consécutifs ou immatériels.</p>
-
-<h4>6.1 Décharge de responsabilité spécifique aux interventions</h4>
-<p>Le Client reconnaît que les interventions réalisées par le Prestataire (reprogrammation, optimisation moteur, calibration ECU, réglages sur banc à rouleaux, etc.) comportent des risques inhérents liés à l’état du véhicule et à son passif mécanique, qui peuvent entraîner des défaillances indépendantes de la prestation.</p>
-<p>Le Prestataire n’est pas responsable de :</p>
-<ul>
-<li>Toute casse mécanique (moteur, boîte, transmission, périphériques, etc.) survenant pendant ou après l’intervention ;</li>
-<li>Les dommages ou dysfonctionnements résultant de composants antérieurement endommagés ou usés ;</li>
-<li>Toute conséquence liée à un usage non conforme ou à une modification ultérieure du véhicule.</li>
-</ul>
-<p>Le Client confirme avoir été informé de ces risques et accepte que le Prestataire n’encourt aucune responsabilité au-delà du strict cadre de la prestation réalisée.</p>
-
-<h3>7. Rétractation</h3>
-<p>Conformément à l’article L221-18 du Code de la consommation, le Client bénéficie d’un délai de 14 jours pour exercer son droit de rétractation. Ce droit ne s’applique toutefois pas aux prestations pleinement exécutées avant la fin du délai, avec l’accord du Client. Pour exercer ce droit, le Client doit contacter le Prestataire à l’adresse suivante : <strong>ajmmciservice@gmail.com</strong>.</p>
-
-<h3>8. Règlement des litiges</h3>
-<p>En cas de litige, les parties s’engagent à rechercher une solution amiable. À défaut, le litige sera soumis aux tribunaux compétents du ressort du siège social du Prestataire.</p>
-
-<h3>9. Protection des données personnelles</h3>
-<p>Les données collectées sont nécessaires à la gestion des commandes et au suivi des relations commerciales. Conformément au Règlement Général sur la Protection des Données (RGPD), le Client dispose d’un droit d’accès, de rectification et de suppression de ses données en contactant le Prestataire à l’adresse suivante : <strong>ajmmciservice@gmail.com</strong>. La durée de conservation des données est de <strong>365 jours</strong>.</p>
-
-<h3>10. Acceptation des CGV</h3>
-<p>Le Client reconnaît avoir pris connaissance des présentes CGV et les accepter sans réserve. Les CGV peuvent être modifiées à tout moment par le Prestataire, et les modifications seront applicables à toute commande postérieure à leur publication.</p>
-
-
-</section>
-
-
-<section id="Réalisation" style="display:none;">
-  <h2>Voici quelques-unes de nos réalisations</h2>
-  <a href="https://www.instagram.com/ajm_tune" target="_blank">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" style="width:50px;height:50px;">
-  </a>
-  <p>Insta : ajm_tune</p>
-</section>
-
-<footer>
-  <p>© 2025 AJM Service - Tous droits réservés</p>
-  <a href="mailto:ajmmciservice@gmail.com" style="color:#fff;text-decoration:none;" 
-     onmouseover="this.style.color='#ff9900'" onmouseout="this.style.color='#ffffff'">Contact</a>
-  <p>By : AJM Service</p>
-</footer>
-
-</body>
+    <footer>
+      <p>© 2025 AJM Service - Tous droits réservés</p>
+      <a
+        href="mailto:ajmmciservice@gmail.com"
+        style="color:#fff;text-decoration:none;"
+        onmouseover="this.style.color='#ff9900'"
+        onmouseout="this.style.color='#ffffff'"
+        >Contact</a
+      >
+      <p>By : AJM Service</p>
+    </footer>
+  </body>
 </html>
