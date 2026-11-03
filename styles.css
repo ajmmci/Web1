@@ -266,3 +266,20 @@ footer p {
   background-color: rgba(0,0,0,0.8);
 }
 
+/* Bouton outil MS43 en ligne */
+.ms43-cta {
+    display: inline-block;
+    padding: 12px 20px;
+    margin-top: 18px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #007BFF, #FF7500);
+    color: #fff !important;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.ms43-cta:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+}
