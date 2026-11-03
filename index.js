@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function() {
       basePrice = 300;
       gestionSection.style.display = "block";
       if (rent) basePrice += 250;
-    } else if (rt === "300") basePrice = 300;
+    } else if (rt === "200") basePrice = 200;
     else if (rt === "150") basePrice = 150;
     else basePrice = 0;
 
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Formulaire
 (function(){ emailjs.init("tj78crzPN0_rmmjFS"); })();
-  
+
   form.addEventListener("submit", function(e) {
     e.preventDefault();
    const data = {
@@ -84,7 +84,6 @@ document.addEventListener("DOMContentLoaded", function() {
   gestionBrand: document.getElementById("gestionBrand") ? document.getElementById("gestionBrand").value : "",
   rentBench: document.getElementById("rentBench") ? document.getElementById("rentBench").checked : false
 };
-
 
     emailjs.send("service_bsoe5lw","template_y1s1oe6", data)
       .then(() => {
@@ -122,7 +121,3 @@ window.prevSlide = function () {
 };
 
 });
-
-
-
-
