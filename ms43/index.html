@@ -87,10 +87,10 @@
   // Rideau de developpement : empreinte SHA-256 du mot de passe (le mot n'est pas en clair ici).
   // Protection legere cote navigateur, contournable : ne remplace pas une vraie authentification.
   // Pour changer le mot de passe, remplace l'empreinte ci-dessous (SHA-256 du nouveau mot).
+  // Pas de memorisation : le mot de passe est redemande a chaque ouverture ou rechargement.
   var PASS_HASH = '93df9dd6e6a179b1fa5aa267b5cb949bca793111ac581c17128f560a6b9e4c4e';
   var gate = document.getElementById('authGate');
   function unlock() { gate.remove(); }
-  try { if (localStorage.getItem('ms43_auth') === PASS_HASH) { unlock(); return; } } catch (e) {}
   async function sha(s) {
     var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
     return Array.from(new Uint8Array(buf)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
@@ -98,7 +98,7 @@
   document.getElementById('authForm').addEventListener('submit', async function (e) {
     e.preventDefault();
     var h = await sha(document.getElementById('authPass').value);
-    if (h === PASS_HASH) { try { localStorage.setItem('ms43_auth', PASS_HASH); } catch (e) {} unlock(); }
+    if (h === PASS_HASH) { unlock(); }
     else { document.getElementById('authErr').textContent = 'Mot de passe incorrect.'; }
   });
 })();
