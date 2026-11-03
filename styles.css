@@ -210,39 +210,6 @@ footer p {
     margin-bottom: 1px;
 }
 
-/* Réalisations : photos Instagram */
-.insta-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 12px;
-  max-width: 1000px;
-  margin: 20px auto 30px;
-}
-
-.insta-grid a {
-  display: block;
-  overflow: hidden;
-  border-radius: 8px;
-}
-
-.insta-grid img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
-  transition: transform 0.3s;
-}
-
-.insta-grid a:hover img {
-  transform: scale(1.04);
-}
-
-.insta-credit {
-  margin: -18px 0 24px;
-  font-size: 0.85rem;
-  color: #555;
-}
-
 /* Bouton outil MS43 en ligne */
 .ms43-cta {
     display: inline-block;
