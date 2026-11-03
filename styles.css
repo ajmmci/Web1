@@ -210,60 +210,37 @@ footer p {
     margin-bottom: 1px;
 }
 
-.slider {
-  position: relative;
-  width: 80%;
-  margin: auto;
+/* Réalisations : photos Instagram */
+.insta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  max-width: 1000px;
+  margin: 20px auto 30px;
+}
+
+.insta-grid a {
+  display: block;
   overflow: hidden;
+  border-radius: 8px;
 }
 
-.slides {
-  display: flex;
-  transition: transform 0.5s ease-in-out;
-}
-
-.slide {
-  min-width: 100%;
-  text-align: center;
-}
-
-.slide img {
-  width: 50%;
-  max-height: 500px;
+.insta-grid img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
   object-fit: cover;
-  border-radius: 0px;
+  transition: transform 0.3s;
 }
 
-.slide p {
-  margin-top: 10px;
-  font-size: 16px;
-  color: #333;
+.insta-grid a:hover img {
+  transform: scale(1.04);
 }
 
-/* Flèches */
-.arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: rgba(0,0,0,0.6);
-  color: white;
-  border: none;
-  font-size: 30px;
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 50%;
-}
-
-.arrow.left {
-  left: 10px;
-}
-
-.arrow.right {
-  right: 10px;
-}
-
-.arrow:hover {
-  background-color: rgba(0,0,0,0.8);
+.insta-credit {
+  margin: -18px 0 24px;
+  font-size: 0.85rem;
+  color: #555;
 }
 
 /* Bouton outil MS43 en ligne */
