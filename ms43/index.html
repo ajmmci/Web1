@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Service MS43</title>
+<style>
+  :root {
+    --bg: #eef1f5; --card: #ffffff; --ink: #161a1f; --muted: #5d6673; --line: #dde2e9;
+    --accent: #0b5bd1; --accent-ink: #ffffff; --ok: #0a7d33; --warn: #9a5b08; --err: #c22323;
+    --ok-bg: #e4f4ea; --warn-bg: #faeede; --err-bg: #fbe6e6; --shadow: 0 1px 3px rgba(20,30,50,.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12151a; --card: #1c2027; --ink: #e7eaee; --muted: #98a2ae; --line: #2e3540;
+      --accent: #4d9bff; --accent-ink: #0b1017; --ok: #49cf6d; --warn: #e3ad55; --err: #ff7373;
+      --ok-bg: #16311f; --warn-bg: #352a16; --err-bg: #391c1c; --shadow: 0 1px 3px rgba(0,0,0,.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); }
+  body { margin: 0; color: var(--ink); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 28px 16px 72px; }
+  header h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -.01em; }
+  header p { color: var(--muted); margin: 0 0 22px; font-size: 13.5px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .card h2 { font-size: 15px; margin: 0 0 14px; display: flex; align-items: center; gap: 8px; }
+  .step { display: inline-flex; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: 12px; font-weight: 700; align-items: center; justify-content: center; }
+  .drop { border: 2px dashed var(--line); border-radius: 12px; padding: 34px 16px; text-align: center; color: var(--muted); cursor: pointer; transition: border-color .15s, background .15s; }
+  .drop:hover, .drop.over { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); color: var(--ink); }
+  .drop b { color: var(--ink); }
+  .fname { margin-top: 8px; font-size: 13px; color: var(--muted); word-break: break-all; }
+  .grid { display: grid; grid-template-columns: 160px 1fr; gap: 10px 14px; align-items: center; }
+  .grid .k { color: var(--muted); font-size: 13px; }
+  .grid .v { font-weight: 600; }
+  @media (max-width: 440px) { .grid { grid-template-columns: 1fr; gap: 4px 0; } .grid .v { margin-bottom: 8px; } }
+  .tag { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; vertical-align: middle; }
+  .tag.ok { background: var(--ok-bg); color: var(--ok); }
+  .tag.warn { background: var(--warn-bg); color: var(--warn); }
+  .tag.err { background: var(--err-bg); color: var(--err); }
+  select, button { font: inherit; border-radius: 9px; border: 1px solid var(--line); padding: 9px 13px; background: var(--card); color: var(--ink); }
+  select { max-width: 220px; }
+  button { cursor: pointer; }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; font-weight: 700; }
+  button.ghost { background: transparent; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .banner { border-radius: 10px; padding: 11px 14px; font-size: 13.5px; margin-top: 4px; }
+  .banner.err { background: var(--err-bg); color: var(--err); }
+  .banner.warn { background: var(--warn-bg); color: var(--warn); }
+  label.rec { display: flex; gap: 11px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--line); cursor: pointer; }
+  label.rec:first-of-type { border-top: 0; }
+  label.rec input { margin-top: 3px; width: 16px; height: 16px; flex: none; }
+  label.rec .t { font-weight: 600; }
+  label.rec .d { color: var(--muted); font-size: 13px; }
+  label.rec .m { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 16px; }
+  .sel-tools { display: flex; gap: 14px; font-size: 13px; margin-bottom: 6px; }
+  .sel-tools a { color: var(--accent); cursor: pointer; }
+  .change { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 4px 0; border-top: 1px solid var(--line); }
+  .change span:first-child { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  .note { font-size: 12.5px; color: var(--muted); }
+  .note ul { margin: 8px 0 0; padding-left: 18px; }
+  .note li { margin: 3px 0; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Service MS43</h1>
+    <p>Détection automatique de la version logiciel et application des modifications validées. Le fichier reste dans ton navigateur&nbsp;: rien n'est envoyé sur un serveur.</p>
+  </header>
+
+  <section class="card">
+    <h2><span class="step">1</span> Importer le fichier</h2>
+    <div id="drop" class="drop">
+      <div>Dépose un fichier <b>.bin</b> (512&nbsp;Ko), ou clique pour le choisir</div>
+      <div id="fname" class="fname"></div>
+    </div>
+    <input id="file" type="file" accept=".bin,application/octet-stream" class="hidden">
+  </section>
+
+  <section id="detectCard" class="card hidden">
+    <h2><span class="step">2</span> Détection</h2>
+    <div class="grid">
+      <div class="k">Taille</div><div class="v" id="vSize"></div>
+      <div class="k">Version logiciel</div><div class="v" id="vSw"></div>
+      <div class="k">Base moteur</div>
+      <div class="v">
+        <span id="vEngine"></span>
+        <select id="engineSel" class="hidden"></select>
+      </div>
+    </div>
+    <div id="detectBanner"></div>
+  </section>
+
+  <section id="recipesCard" class="card hidden">
+    <h2><span class="step">3</span> Modifications</h2>
+    <div id="recipesInfo" class="note" style="margin-bottom:10px"></div>
+    <div id="selTools" class="sel-tools hidden">
+      <a id="selAll">Tout cocher</a><a id="selNone">Tout décocher</a>
+    </div>
+    <div id="recipes"></div>
+    <div class="actions">
+      <button id="apply" class="primary">Appliquer et télécharger</button>
+      <button id="reset" class="ghost">Recommencer</button>
+      <span id="applyMsg"></span>
+    </div>
+  </section>
+
+  <section id="reportCard" class="card hidden">
+    <h2>Rapport</h2>
+    <div id="reportBody"></div>
+    <div class="actions"><button id="redownload" class="ghost">Télécharger à nouveau</button></div>
+  </section>
+
+  <section class="card note">
+    <strong>À savoir avant de flasher</strong>
+    <ul>
+      <li>Les sommes de contrôle ne sont pas recalculées ici&nbsp;: utilise un flasher qui les corrige à l'écriture.</li>
+      <li>Les valeurs des modifications proviennent d'un fichier B22&nbsp;; elles doivent être validées sur banc ou sur un calculateur de test avant tout usage.</li>
+      <li>Les fonctions de dépollution et l'antidémarrage (EWS) ne sont pas proposés.</li>
+      <li>L'original n'est jamais modifié&nbsp;: le fichier téléchargé est une copie.</li>
+    </ul>
+  </section>
+</main>
+
+<script type="module">
+import { IMAGE_SIZE, ENGINES, detectSoftware, detectEngine, applyRecipes } from './src/ms43.js';
+
+const $ = (id) => document.getElementById(id);
+let bytes = null, fileName = '', sw = null, allRecipes = [], shown = [], lastOutput = null;
+
+// --- Chargement du catalogue de recettes (manifeste extensible) ---
+const catalogue = (async () => {
+  try {
+    const list = await (await fetch('recipes/index.json')).json();
+    const files = await Promise.all(list.map((f) => fetch(`recipes/${f}`).then((r) => r.json())));
+    return files.flat();
+  } catch { return []; }
+})();
+
+// --- Import ---
+const drop = $('drop'), fileInput = $('file');
+drop.addEventListener('click', () => fileInput.click());
+drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('over'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+drop.addEventListener('drop', (e) => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) load(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) load(fileInput.files[0]); });
+
+async function load(file) {
+  fileName = file.name;
+  $('fname').textContent = fileName;
+  bytes = new Uint8Array(await file.arrayBuffer());
+  sw = detectSoftware(bytes);
+  $('reportCard').classList.add('hidden');
+  $('applyMsg').textContent = '';
+  showDetection();
+}
+
+const badge = (text, kind) => `<span class="tag ${kind}">${text}</span>`;
+
+function showDetection() {
+  $('detectCard').classList.remove('hidden');
+  $('vSize').textContent = `${bytes.length.toLocaleString('fr-FR')} octets`;
+  const banner = $('detectBanner');
+  banner.innerHTML = '';
+
+  if (sw.status === 'bad_size') {
+    $('vSw').innerHTML = badge('taille invalide', 'err');
+    $('vEngine').textContent = '—';
+    banner.innerHTML = `<div class="banner err">Ce fichier fait ${bytes.length.toLocaleString('fr-FR')} octets. Une lecture MS43 complète fait 524&nbsp;288 octets (512&nbsp;Ko).</div>`;
+    return hideRecipes();
+  }
+  if (sw.status === 'unknown') {
+    $('vSw').innerHTML = badge('inconnue', 'err');
+    $('vEngine').textContent = '—';
+    banner.innerHTML = `<div class="banner err">Version logiciel non reconnue (octets lus&nbsp;: <code>${sw.raw}</code>). Aucune modification n'est appliquée.</div>`;
+    return hideRecipes();
+  }
+  if (sw.status === 'inconsistent') {
+    $('vSw').innerHTML = badge('incohérent', 'err');
+    $('vEngine').textContent = '—';
+    banner.innerHTML = `<div class="banner err">Le programme (${sw.program}) et la calibration (${sw.software}) ne correspondent pas. Fichier refusé.</div>`;
+    return hideRecipes();
+  }
+
+  const variantNote = sw.variants.length > 1 ? ` <span class="note">(${sw.variants.join(' / ')})</span>` : '';
+  $('vSw').innerHTML = badge(sw.software, 'ok') + variantNote;
+
+  const engine = detectEngine(fileName);
+  const sel = $('engineSel');
+  const auto = engine.status === 'known' ? engine.engine : '';
+  sel.innerHTML = `<option value="">— choisir —</option>` + ENGINES.map((e) => `<option value="${e}">${e}</option>`).join('');
+  sel.value = auto;
+  sel.classList.remove('hidden');
+  sel.onchange = buildRecipes;
+
+  if (engine.status === 'known') {
+    $('vEngine').innerHTML = badge(engine.engine, 'ok') + ' <span class="note">d\'après le nom</span> ';
+  } else if (engine.status === 'ambiguous') {
+    $('vEngine').innerHTML = badge(`ambigu : ${engine.found.join(', ')}`, 'warn') + ' ';
+    banner.innerHTML = `<div class="banner warn">Plusieurs bases moteur dans le nom du fichier. Choisis la bonne ci-dessus.</div>`;
+  } else {
+    $('vEngine').innerHTML = badge('à confirmer', 'warn') + ' ';
+    banner.innerHTML = `<div class="banner warn">La base moteur n'est pas lisible dans le nom du fichier. Sélectionne-la ci-dessus.</div>`;
+  }
+  buildRecipes();
+}
+
+function hideRecipes() { $('recipesCard').classList.add('hidden'); }
+
+async function buildRecipes() {
+  $('reportCard').classList.add('hidden');
+  $('applyMsg').textContent = '';
+  const engine = $('engineSel').value;
+  const def = sw.variants[0];
+  const box = $('recipes');
+  allRecipes = await catalogue;
+
+  $('recipesCard').classList.remove('hidden');
+  if (!engine) {
+    $('recipesInfo').textContent = 'Choisis la base moteur pour voir les modifications disponibles.';
+    $('selTools').classList.add('hidden'); box.innerHTML = ''; $('apply').disabled = true;
+    return;
+  }
+  shown = allRecipes.filter((r) => r.software.includes(def) && r.engines.includes(engine));
+  if (shown.length === 0) {
+    $('recipesInfo').textContent = `Aucune modification disponible pour le moteur ${engine} sur le SW ${def} pour le moment.`;
+    $('selTools').classList.add('hidden'); box.innerHTML = ''; $('apply').disabled = true;
+    return;
+  }
+  $('recipesInfo').textContent = `SW ${def}, moteur ${engine} — coche les modifications à appliquer.`;
+  $('selTools').classList.remove('hidden');
+  $('apply').disabled = false;
+  box.innerHTML = shown.map((r, i) => `
+    <label class="rec">
+      <input type="checkbox" value="${i}">
+      <span>
+        <span class="t">${esc(r.name)}</span>
+        <span class="d">${esc(r.description || '')}</span>
+        <span class="m">${r.writes.length} cartographie(s) — source ${esc(r.source)}</span>
+      </span>
+    </label>`).join('');
+}
+
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+$('selAll').onclick = () => document.querySelectorAll('#recipes input').forEach((c) => (c.checked = true));
+$('selNone').onclick = () => document.querySelectorAll('#recipes input').forEach((c) => (c.checked = false));
+$('reset').onclick = () => location.reload();
+
+$('apply').addEventListener('click', async () => {
+  const chosen = [...document.querySelectorAll('#recipes input:checked')].map((c) => shown[+c.value]);
+  if (chosen.length === 0) { $('applyMsg').innerHTML = badge('coche au moins une modification', 'warn'); return; }
+  const engine = $('engineSel').value;
+  const def = sw.variants[0];
+  try {
+    const fullDef = await (await fetch(`defs/${def}.json`)).json();
+    const result = applyRecipes(bytes, fullDef, engine, chosen);
+    lastOutput = result.bytes;
+    showReport(result, engine);
+    download(result.bytes);
+    $('applyMsg').innerHTML = badge(`${result.changes.length} cartographies modifiées`, 'ok');
+  } catch (e) {
+    $('reportCard').classList.add('hidden');
+    $('applyMsg').innerHTML = badge(e.message, 'err');
+  }
+});
+
+function showReport(result, engine) {
+  $('reportCard').classList.remove('hidden');
+  const fmt = (v) => (Number.isInteger(v) ? v : Number(v.toFixed(3)));
+  const rounded = result.rounded.length
+    ? `<div class="banner warn">${result.rounded.length} valeur(s) ajustée(s) au pas le plus proche de la cartographie.</div>` : '';
+  const rows = result.changes.slice(0, 50).map((c) =>
+    `<div class="change"><span>${esc(c.map)}[${c.index}]</span><span>${fmt(c.before)} → ${fmt(c.after)} ${esc(c.units || '')}</span></div>`).join('');
+  const more = result.changes.length > 50 ? `<div class="note" style="margin-top:6px">… et ${result.changes.length - 50} autres.</div>` : '';
+  $('reportBody').innerHTML =
+    `<p>Moteur <b>${engine}</b> — <b>${result.changes.length}</b> cartographies modifiées. Le fichier a été téléchargé.</p>${rounded}${rows}${more}`;
+}
+
+function download(data) {
+  const blob = new Blob([data], { type: 'application/octet-stream' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fileName.replace(/\.bin$/i, '') + '_modifie.bin';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+$('redownload').onclick = () => { if (lastOutput) download(lastOutput); };
+</script>
+</body>
+</html>
