@@ -67,6 +67,9 @@ function explainEmailJsError(err) {
   if (/recipients address is empty/i.test(text)) {
     return "Le modèle EmailJS n'a pas d'adresse de destination (champ « To Email »).";
   }
+  if (/sdk version is unsupported/i.test(text)) {
+    return "La version d'EmailJS chargée par la page est trop ancienne (mettre à jour la balise <script> dans index.html).";
+  }
   if (/limit|quota/i.test(text) || status === 426 || status === 429) {
     return "La limite d'envoi EmailJS est atteinte. Réessayez plus tard.";
   }
@@ -117,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (typeof emailjs === "undefined") {
     console.error("EmailJS n'est pas chargé : vérifiez la balise <script> dans index.html.");
   } else {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
   }
 
   const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
@@ -164,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setSending(true);
 
     emailjs
-      .send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, data, EMAILJS_PUBLIC_KEY)
+      .send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, data, { publicKey: EMAILJS_PUBLIC_KEY })
       .then(function () {
         form.reset();
         updatePrice();
