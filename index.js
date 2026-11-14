@@ -26,7 +26,7 @@ function showHome() {
     if (el) el.style.display = "none";
   });
   const hero = document.getElementById("hero");
-  if (hero) hero.style.display = "block";
+  if (hero) hero.style.display = ""; // laisse styles.css centrer l'accueil sur toute la hauteur
 }
 
 // =====================================================
