@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Service MS43 — Clients</title>
+<title>Service MS43</title>
 <style>
   /* Palette alignee sur le site AJM : fond clair, orange #FF7500 / bleu #007BFF. */
   :root {
@@ -79,12 +79,13 @@
 window.AJM = (function () {
   var I18N = {
     fr: {
-      gate_h1: 'Espace clients AJM',
-      gate_p: 'Entre le mot de passe communiqué par AJM pour continuer.',
+      gate_h1: 'Accès MS43',
+      gate_p: 'Entre ton mot de passe pour continuer.',
       gate_ph: 'Mot de passe',
       gate_btn: 'Entrer',
       gate_bad: 'Mot de passe incorrect.',
-      header_p: 'Importe ta lecture d\'origine, choisis tes modifications et télécharge le fichier. Ta lecture d\'origine est transmise à AJM pour le suivi de ta demande.',
+      header_admin: 'Détection automatique de la version logiciel et application des modifications validées. Le fichier reste dans ton navigateur&nbsp;: rien n\'est envoyé sur un serveur.',
+      header_client: 'Importe ta lecture d\'origine, choisis tes modifications et télécharge le fichier. Ta lecture d\'origine est transmise à AJM pour le suivi de ta demande.',
       s1: 'Importer le fichier',
       drop: 'Dépose un fichier <b>.bin</b> (512&nbsp;Ko), ou clique pour le choisir',
       s2: 'Détection',
@@ -95,8 +96,10 @@ window.AJM = (function () {
       sel_all: 'Tout cocher',
       sel_none: 'Tout décocher',
       apply: 'Envoyer la demande et télécharger',
+      apply_admin: 'Appliquer et télécharger',
       reset: 'Recommencer',
       report: 'Confirmation',
+      report_detail: 'Rapport',
       redownload: 'Télécharger à nouveau',
       sent: 'Demande transmise à AJM',
       done_msg: 'Ton fichier a été préparé et téléchargé. Ta demande a été transmise à AJM — garde bien ta lecture d\'origine de côté.',
@@ -130,18 +133,20 @@ window.AJM = (function () {
       maps_count: function (n) { return n + ' cartographie(s)'; },
       need_one: 'coche au moins une modification',
       applied_ok: 'Fichier téléchargé',
+      applied_detail: function (n) { return n + ' cartographies modifiées'; },
       report_line: function (eng, n) { return 'Moteur <b>' + eng + '</b> — <b>' + n + '</b> cartographies modifiées. Le fichier a été téléchargé.'; },
       rounded: function (n) { return n + ' valeur(s) ajustée(s) au pas le plus proche de la cartographie.'; },
       more: function (n) { return '… et ' + n + ' autres.'; },
       locale: 'fr-FR'
     },
     en: {
-      gate_h1: 'AJM customer area',
-      gate_p: 'Enter the password provided by AJM to continue.',
+      gate_h1: 'MS43 access',
+      gate_p: 'Enter your password to continue.',
       gate_ph: 'Password',
       gate_btn: 'Enter',
       gate_bad: 'Incorrect password.',
-      header_p: 'Import your original read, pick your modifications and download the file. Your original read is sent to AJM to process your request.',
+      header_admin: 'Automatic software version detection and application of validated modifications. The file stays in your browser&nbsp;: nothing is sent to a server.',
+      header_client: 'Import your original read, pick your modifications and download the file. Your original read is sent to AJM to process your request.',
       s1: 'Import the file',
       drop: 'Drop a <b>.bin</b> file (512&nbsp;KB), or click to choose it',
       s2: 'Detection',
@@ -152,8 +157,10 @@ window.AJM = (function () {
       sel_all: 'Select all',
       sel_none: 'Clear all',
       apply: 'Send request and download',
+      apply_admin: 'Apply and download',
       reset: 'Start over',
       report: 'Confirmation',
+      report_detail: 'Report',
       redownload: 'Download again',
       sent: 'Request sent to AJM',
       done_msg: 'Your file has been prepared and downloaded. Your request has been sent to AJM — keep your original read safe.',
@@ -187,6 +194,7 @@ window.AJM = (function () {
       maps_count: function (n) { return n + ' map(s)'; },
       need_one: 'tick at least one modification',
       applied_ok: 'File downloaded',
+      applied_detail: function (n) { return n + ' maps modified'; },
       report_line: function (eng, n) { return 'Engine <b>' + eng + '</b> — <b>' + n + '</b> maps modified. The file has been downloaded.'; },
       rounded: function (n) { return n + ' value(s) adjusted to the map\'s nearest step.'; },
       more: function (n) { return '… and ' + n + ' more.'; },
@@ -220,8 +228,8 @@ window.AJM = (function () {
 </div>
 <div id="authGate">
   <form class="box" id="authForm">
-    <h1 data-i18n="gate_h1">Espace clients AJM</h1>
-    <p data-i18n="gate_p">Entre le mot de passe communiqué par AJM pour continuer.</p>
+    <h1 data-i18n="gate_h1">Accès MS43</h1>
+    <p data-i18n="gate_p">Entre ton mot de passe pour continuer.</p>
     <input id="authPass" type="password" autocomplete="current-password" data-i18n-ph="gate_ph" placeholder="Mot de passe" autofocus>
     <button class="primary" type="submit" data-i18n="gate_btn">Entrer</button>
     <div class="err" id="authErr"></div>
@@ -229,21 +237,26 @@ window.AJM = (function () {
 </div>
 <script>
 (function () {
-  // Rideau clients : empreinte SHA-256 du mot de passe (le mot n'est pas en clair ici).
+  // Rideau : deux mots de passe (empreintes SHA-256, le mot n'est pas en clair ici).
   // Protection legere cote navigateur, contournable : ne remplace pas une vraie authentification.
-  // Mot de passe par defaut : CLIENT  -> change-le en remplacant l'empreinte (SHA-256 du nouveau mot).
-  // Pas de memorisation : le mot de passe est redemande a chaque ouverture ou rechargement.
-  var PASS_HASH = '50d7026e31bc614f02983439cd0e9d83857b237f703fc9f5463a2a371dcc61f8';
+  //   AJM    -> mode "admin"  (rapport detaille, pas d'envoi mail, pas d'historique)
+  //   CLIENT -> mode "client" (detail masque, envoi de l'original a AJM, historique)
+  // Casse et espaces ignores. Pas de memorisation : redemande a chaque ouverture/rechargement.
+  // Pour changer un mot de passe, remplace l'empreinte correspondante (SHA-256 du nouveau mot en MAJUSCULES).
+  var ADMIN_HASH = '93df9dd6e6a179b1fa5aa267b5cb949bca793111ac581c17128f560a6b9e4c4e';  // AJM
+  var CLIENT_HASH = '50d7026e31bc614f02983439cd0e9d83857b237f703fc9f5463a2a371dcc61f8'; // CLIENT
   var gate = document.getElementById('authGate');
   function unlock() { gate.remove(); }
+  function setMode(m) { window.__ms43mode = m; if (window.__applyMode) window.__applyMode(m); }
   async function sha(s) {
     var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
     return Array.from(new Uint8Array(buf)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
   }
   document.getElementById('authForm').addEventListener('submit', async function (e) {
     e.preventDefault();
-    var h = await sha(document.getElementById('authPass').value);
-    if (h === PASS_HASH) { unlock(); }
+    var h = await sha(document.getElementById('authPass').value.trim().toUpperCase());
+    if (h === ADMIN_HASH) { setMode('admin'); unlock(); }
+    else if (h === CLIENT_HASH) { setMode('client'); unlock(); }
     else { document.getElementById('authErr').textContent = window.AJM.t('gate_bad'); }
   });
 })();
@@ -253,7 +266,7 @@ window.AJM = (function () {
 <main>
   <header>
     <h1>Service MS43</h1>
-    <p data-i18n="header_p">Importe ta lecture d'origine, choisis tes modifications et télécharge le fichier. Ta lecture d'origine est transmise à AJM pour le suivi de ta demande.</p>
+    <p id="headerP">Détection automatique de la version logiciel et application des modifications.</p>
   </header>
 
   <section class="card">
@@ -287,7 +300,7 @@ window.AJM = (function () {
     </div>
     <div id="recipes"></div>
     <div class="actions">
-      <button id="apply" class="primary" data-i18n="apply">Envoyer la demande et télécharger</button>
+      <button id="apply" class="primary">Appliquer et télécharger</button>
       <button id="reset" class="ghost" data-i18n="reset">Recommencer</button>
       <span id="applyMsg"></span>
       <span id="sendMsg"></span>
@@ -295,12 +308,12 @@ window.AJM = (function () {
   </section>
 
   <section id="reportCard" class="card hidden">
-    <h2 data-i18n="report">Rapport</h2>
+    <h2 id="reportTitle">Rapport</h2>
     <div id="reportBody"></div>
     <div class="actions"><button id="redownload" class="ghost" data-i18n="redownload">Télécharger à nouveau</button></div>
   </section>
 
-  <section id="historyCard" class="card">
+  <section id="historyCard" class="card hidden">
     <div class="hist-head">
       <h2 data-i18n="hist_title">Mes demandes</h2>
       <button id="histClear" class="ghost" data-i18n="hist_clear">Vider</button>
@@ -312,7 +325,7 @@ window.AJM = (function () {
   <section class="card note">
     <strong data-i18n="note_title">À savoir avant de flasher</strong>
     <ul>
-      <li data-i18n="note_send">Ta lecture d'origine est envoyée à AJM au moment de la demande, pour préparer ta cartographie.</li>
+      <li id="noteSend" data-i18n="note_send">Ta lecture d'origine est envoyée à AJM au moment de la demande, pour préparer ta cartographie.</li>
       <li data-i18n="note_1">Les sommes de contrôle ne sont pas recalculées ici&nbsp;: utilise un flasher qui les corrige à l'écriture.</li>
       <li data-i18n="note_2">Les valeurs des modifications proviennent de fichiers de référence&nbsp;; elles doivent être validées sur banc ou sur un calculateur de test avant tout usage.</li>
       <li data-i18n="note_3">Les fonctions de dépollution et l'antidémarrage (EWS) ne sont pas proposés.</li>
@@ -324,18 +337,27 @@ window.AJM = (function () {
 <script type="module">
 import { IMAGE_SIZE, ENGINES, detectSoftware, detectEngine, applyRecipes } from './src/ms43.js';
 
-// ================== CONFIGURATION ENVOI MAIL (à remplir par AJM) ==================
-// 1) Va sur https://formsubmit.co  ->  entre ton mail (ajmmciservice@gmail.com)  ->  valide le mail d'activation.
-// 2) FormSubmit te donne un ALIAS (une chaine aléatoire) pour garder ton adresse cachée.
-// 3) Remplace la valeur ci-dessous par : https://formsubmit.co/el/TON-ALIAS
-//    (tant que ce n'est pas remplacé, l'envoi est désactivé mais l'outil fonctionne.)
+// ================== CONFIGURATION ENVOI MAIL (mode client) ==================
+// Utilisé uniquement en mode client (mot de passe CLIENT). En mode admin (AJM), rien n'est envoyé.
+// Alias FormSubmit d'AJM (garde l'adresse mail hors du code) :
 const FORM_ENDPOINT = 'https://formsubmit.co/el/busitu';
 const SEND_READY = !/REMPLACE|TON-ALIAS/i.test(FORM_ENDPOINT);
-// =================================================================================
+// ===========================================================================
 
 const $ = (id) => document.getElementById(id);
 const T = (...a) => window.AJM.t(...a);
 const nf = (n) => n.toLocaleString(T('locale'));
+
+// Mode courant : 'admin' (AJM) ou 'client' (CLIENT). Fixé par le rideau au déverrouillage.
+let mode = window.__ms43mode || 'client';
+window.__applyMode = (m) => { window.__ms43mode = m; mode = m; renderMode(); };
+function renderMode() {
+  $('headerP').innerHTML = T(mode === 'admin' ? 'header_admin' : 'header_client');
+  $('apply').textContent = T(mode === 'admin' ? 'apply_admin' : 'apply');
+  $('historyCard').classList.toggle('hidden', mode !== 'client');  // historique : client seulement
+  $('noteSend').classList.toggle('hidden', mode !== 'client');     // mention "envoi à AJM" : client seulement
+  renderHistory();
+}
 
 // Traduction EN des recettes, par texte FR exact (les JSON restent inchangés).
 const RNAME_EN = {
@@ -517,7 +539,7 @@ function sendOriginal(file, meta) {
   setTimeout(() => form.remove(), 20000);
 }
 
-// --- Historique local (ce navigateur uniquement) ---
+// --- Historique local (mode client, ce navigateur uniquement) ---
 const HKEY = 'ms43_client_history';
 const loadHistory = () => { try { return JSON.parse(localStorage.getItem(HKEY) || '[]'); } catch { return []; } };
 const saveHistory = (list) => { try { localStorage.setItem(HKEY, JSON.stringify(list.slice(0, 50))); } catch {} };
@@ -542,17 +564,19 @@ $('apply').addEventListener('click', async () => {
     lastResult = result; lastEngine = engine;
     showReport(result, engine);
     download(result.bytes);
-    $('applyMsg').innerHTML = badge(T('applied_ok', result.changes.length), 'ok');
+    $('applyMsg').innerHTML = badge(mode === 'admin' ? T('applied_detail', result.changes.length) : T('applied_ok'), 'ok');
 
-    // Demande : enregistre dans l'historique local + envoie l'original à AJM.
-    const modsNames = chosen.map((r) => recName(r)).join(', ');
-    const entry = { date: new Date().toLocaleString(T('locale')), file: fileName, sw: sw.software, engine, mods: modsNames };
-    addHistory(entry);
-    if (SEND_READY && originalFile) {
-      sendOriginal(originalFile, { file: fileName, sw: sw.software, engine, mods: modsNames, date: entry.date });
-      $('sendMsg').innerHTML = badge(T('sent'), 'ok');
-    } else if (!SEND_READY) {
-      console.warn('[MS43] Envoi désactivé : renseigne FORM_ENDPOINT (alias FormSubmit) pour activer l\'envoi du fichier à AJM.');
+    // Mode client uniquement : enregistre la demande en local + envoie l'original à AJM.
+    if (mode === 'client') {
+      const modsNames = chosen.map((r) => recName(r)).join(', ');
+      const entry = { date: new Date().toLocaleString(T('locale')), file: fileName, sw: sw.software, engine, mods: modsNames };
+      addHistory(entry);
+      if (SEND_READY && originalFile) {
+        sendOriginal(originalFile, { file: fileName, sw: sw.software, engine, mods: modsNames, date: entry.date });
+        $('sendMsg').innerHTML = badge(T('sent'), 'ok');
+      } else if (!SEND_READY) {
+        console.warn('[MS43] Envoi désactivé : renseigne FORM_ENDPOINT (alias FormSubmit) pour activer l\'envoi du fichier à AJM.');
+      }
     }
   } catch (e) {
     lastResult = null;
@@ -562,9 +586,21 @@ $('apply').addEventListener('click', async () => {
 });
 
 function showReport(result, engine) {
-  // Page client : pas de détail ligne par ligne, juste une confirmation.
   $('reportCard').classList.remove('hidden');
-  $('reportBody').innerHTML = `<p>${T('done_msg')}</p>`;
+  $('reportTitle').textContent = T(mode === 'admin' ? 'report_detail' : 'report');
+  if (mode === 'admin') {
+    // Mode admin : rapport détaillé, cartographie par cartographie.
+    const fmt = (v) => (Number.isInteger(v) ? v : Number(v.toFixed(3)));
+    const rounded = result.rounded.length
+      ? `<div class="banner warn">${T('rounded', result.rounded.length)}</div>` : '';
+    const rows = result.changes.slice(0, 50).map((c) =>
+      `<div class="change"><span>${esc(c.map)}[${c.index}]</span><span>${fmt(c.before)} → ${fmt(c.after)} ${esc(c.units || '')}</span></div>`).join('');
+    const more = result.changes.length > 50 ? `<div class="note" style="margin-top:6px">${T('more', result.changes.length - 50)}</div>` : '';
+    $('reportBody').innerHTML = `<p>${T('report_line', engine, result.changes.length)}</p>${rounded}${rows}${more}`;
+  } else {
+    // Mode client : pas de détail, juste une confirmation.
+    $('reportBody').innerHTML = `<p>${T('done_msg')}</p>`;
+  }
 }
 
 function download(data) {
@@ -577,14 +613,14 @@ function download(data) {
 }
 $('redownload').onclick = () => { if (lastOutput) download(lastOutput); };
 
-// Re-rendu du contenu dynamique au changement de langue, puis application initiale (FR).
+// Re-rendu du contenu dynamique au changement de langue, puis application initiale.
 window.AJM.onChange(() => {
   if (bytes && sw) showDetection();
   if (lastResult) showReport(lastResult, lastEngine);
-  renderHistory();
+  renderMode();
 });
 window.AJM.applyStatic();
-renderHistory();
+renderMode();
 </script>
 </body>
 </html>
