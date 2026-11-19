@@ -96,9 +96,10 @@ window.AJM = (function () {
       sel_none: 'Tout décocher',
       apply: 'Envoyer la demande et télécharger',
       reset: 'Recommencer',
-      report: 'Rapport',
+      report: 'Confirmation',
       redownload: 'Télécharger à nouveau',
       sent: 'Demande transmise à AJM',
+      done_msg: 'Ton fichier a été préparé et téléchargé. Ta demande a été transmise à AJM — garde bien ta lecture d\'origine de côté.',
       hist_title: 'Mes demandes',
       hist_clear: 'Vider',
       hist_empty: 'Aucune demande pour le moment. Ton historique s\'affiche ici (sur ce navigateur).',
@@ -128,7 +129,7 @@ window.AJM = (function () {
       info_ready: function (def, eng) { return 'SW ' + def + ', moteur ' + eng + ' — coche les modifications à appliquer.'; },
       maps_count: function (n) { return n + ' cartographie(s)'; },
       need_one: 'coche au moins une modification',
-      applied_ok: function (n) { return n + ' cartographies modifiées'; },
+      applied_ok: 'Fichier téléchargé',
       report_line: function (eng, n) { return 'Moteur <b>' + eng + '</b> — <b>' + n + '</b> cartographies modifiées. Le fichier a été téléchargé.'; },
       rounded: function (n) { return n + ' valeur(s) ajustée(s) au pas le plus proche de la cartographie.'; },
       more: function (n) { return '… et ' + n + ' autres.'; },
@@ -152,9 +153,10 @@ window.AJM = (function () {
       sel_none: 'Clear all',
       apply: 'Send request and download',
       reset: 'Start over',
-      report: 'Report',
+      report: 'Confirmation',
       redownload: 'Download again',
       sent: 'Request sent to AJM',
+      done_msg: 'Your file has been prepared and downloaded. Your request has been sent to AJM — keep your original read safe.',
       hist_title: 'My requests',
       hist_clear: 'Clear',
       hist_empty: 'No requests yet. Your history appears here (on this browser).',
@@ -184,7 +186,7 @@ window.AJM = (function () {
       info_ready: function (def, eng) { return 'SW ' + def + ', ' + eng + ' engine — tick the modifications to apply.'; },
       maps_count: function (n) { return n + ' map(s)'; },
       need_one: 'tick at least one modification',
-      applied_ok: function (n) { return n + ' maps modified'; },
+      applied_ok: 'File downloaded',
       report_line: function (eng, n) { return 'Engine <b>' + eng + '</b> — <b>' + n + '</b> maps modified. The file has been downloaded.'; },
       rounded: function (n) { return n + ' value(s) adjusted to the map\'s nearest step.'; },
       more: function (n) { return '… and ' + n + ' more.'; },
@@ -560,15 +562,9 @@ $('apply').addEventListener('click', async () => {
 });
 
 function showReport(result, engine) {
+  // Page client : pas de détail ligne par ligne, juste une confirmation.
   $('reportCard').classList.remove('hidden');
-  const fmt = (v) => (Number.isInteger(v) ? v : Number(v.toFixed(3)));
-  const rounded = result.rounded.length
-    ? `<div class="banner warn">${T('rounded', result.rounded.length)}</div>` : '';
-  const rows = result.changes.slice(0, 50).map((c) =>
-    `<div class="change"><span>${esc(c.map)}[${c.index}]</span><span>${fmt(c.before)} → ${fmt(c.after)} ${esc(c.units || '')}</span></div>`).join('');
-  const more = result.changes.length > 50 ? `<div class="note" style="margin-top:6px">${T('more', result.changes.length - 50)}</div>` : '';
-  $('reportBody').innerHTML =
-    `<p>${T('report_line', engine, result.changes.length)}</p>${rounded}${rows}${more}`;
+  $('reportBody').innerHTML = `<p>${T('done_msg')}</p>`;
 }
 
 function download(data) {
