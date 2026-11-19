@@ -102,6 +102,8 @@ window.AJM = (function () {
       report_detail: 'Rapport',
       redownload: 'Télécharger à nouveau',
       sent: 'Demande transmise à AJM',
+      sending: 'Envoi en cours…',
+      send_fail: 'Envoi à AJM en échec — réessaie',
       done_msg: 'Ton fichier a été préparé et téléchargé. Ta demande a été transmise à AJM — garde bien ta lecture d\'origine de côté.',
       hist_title: 'Mes demandes',
       hist_clear: 'Vider',
@@ -163,6 +165,8 @@ window.AJM = (function () {
       report_detail: 'Report',
       redownload: 'Download again',
       sent: 'Request sent to AJM',
+      sending: 'Sending…',
+      send_fail: 'Send to AJM failed — try again',
       done_msg: 'Your file has been prepared and downloaded. Your request has been sent to AJM — keep your original read safe.',
       hist_title: 'My requests',
       hist_clear: 'Clear',
@@ -339,9 +343,10 @@ import { IMAGE_SIZE, ENGINES, detectSoftware, detectEngine, applyRecipes } from 
 
 // ================== CONFIGURATION ENVOI MAIL (mode client) ==================
 // Utilisé uniquement en mode client (mot de passe CLIENT). En mode admin (AJM), rien n'est envoyé.
-// Alias FormSubmit d'AJM (garde l'adresse mail hors du code) :
-const FORM_ENDPOINT = 'https://formsubmit.co/el/busitu';
-const SEND_READY = !/REMPLACE|TON-ALIAS/i.test(FORM_ENDPOINT);
+// Endpoint AJAX de FormSubmit : réponse lisible (success/erreur), pas de captcha invisible -> fiable en arrière-plan.
+// L'AJAX exige l'e-mail (l'alias "el/..." n'y fonctionne pas). L'adresse est déjà publique sur le site (pied de page / CGV).
+// 1re utilisation depuis ce domaine : FormSubmit envoie un mail "Activate Form" à cliquer UNE seule fois.
+const MAIL_ENDPOINT = 'https://formsubmit.co/ajax/ajmmciservice@gmail.com';
 // ===========================================================================
 
 const $ = (id) => document.getElementById(id);
@@ -514,29 +519,23 @@ $('selAll').onclick = () => document.querySelectorAll('#recipes input').forEach(
 $('selNone').onclick = () => document.querySelectorAll('#recipes input').forEach((c) => (c.checked = false));
 $('reset').onclick = () => location.reload();
 
-// --- Envoi de la lecture d'origine à AJM (FormSubmit, via formulaire caché -> pas de CORS) ---
-function sendOriginal(file, meta) {
-  const form = document.createElement('form');
-  form.action = FORM_ENDPOINT;
-  form.method = 'POST';
-  form.enctype = 'multipart/form-data';
-  form.target = 'fs_sink';
-  form.style.display = 'none';
-  const add = (name, value) => { const i = document.createElement('input'); i.type = 'hidden'; i.name = name; i.value = value; form.appendChild(i); };
-  add('_captcha', 'false');
-  add('_subject', 'Demande MS43 — ' + meta.file);
-  add('Fichier', meta.file);
-  add('Version_SW', meta.sw);
-  add('Base_moteur', meta.engine);
-  add('Modifications', meta.mods);
-  add('Date', meta.date);
-  const fi = document.createElement('input');
-  fi.type = 'file'; fi.name = 'attachment';
-  const dt = new DataTransfer(); dt.items.add(file); fi.files = dt.files;
-  form.appendChild(fi);
-  document.body.appendChild(form);
-  form.submit();
-  setTimeout(() => form.remove(), 20000);
+// --- Envoi de la lecture d'origine à AJM (endpoint AJAX FormSubmit : on lit la réponse) ---
+async function sendOriginal(file, meta) {
+  const fd = new FormData();
+  fd.append('_subject', 'Demande MS43 — ' + meta.file);
+  fd.append('_captcha', 'false');
+  fd.append('_template', 'table');
+  fd.append('Fichier', meta.file);
+  fd.append('Version_SW', meta.sw);
+  fd.append('Base_moteur', meta.engine);
+  fd.append('Modifications', meta.mods);
+  fd.append('Date', meta.date);
+  fd.append('attachment', file, meta.file);
+  try {
+    const r = await fetch(MAIL_ENDPOINT, { method: 'POST', headers: { Accept: 'application/json' }, body: fd });
+    const j = await r.json().catch(() => ({}));
+    return { ok: String(j.success) === 'true', msg: j.message || ('HTTP ' + r.status) };
+  } catch (e) { return { ok: false, msg: String(e) }; }
 }
 
 // --- Historique local (mode client, ce navigateur uniquement) ---
@@ -571,11 +570,11 @@ $('apply').addEventListener('click', async () => {
       const modsNames = chosen.map((r) => recName(r)).join(', ');
       const entry = { date: new Date().toLocaleString(T('locale')), file: fileName, sw: sw.software, engine, mods: modsNames };
       addHistory(entry);
-      if (SEND_READY && originalFile) {
-        sendOriginal(originalFile, { file: fileName, sw: sw.software, engine, mods: modsNames, date: entry.date });
-        $('sendMsg').innerHTML = badge(T('sent'), 'ok');
-      } else if (!SEND_READY) {
-        console.warn('[MS43] Envoi désactivé : renseigne FORM_ENDPOINT (alias FormSubmit) pour activer l\'envoi du fichier à AJM.');
+      if (originalFile) {
+        $('sendMsg').innerHTML = badge(T('sending'), 'warn');
+        const res = await sendOriginal(originalFile, { file: fileName, sw: sw.software, engine, mods: modsNames, date: entry.date });
+        $('sendMsg').innerHTML = badge(res.ok ? T('sent') : T('send_fail'), res.ok ? 'ok' : 'err');
+        if (!res.ok) console.warn('[MS43] Envoi à AJM :', res.msg);
       }
     }
   } catch (e) {
