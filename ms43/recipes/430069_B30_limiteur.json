@@ -3,6 +3,7 @@
         "id":  "limiter_50",
         "name":  "Limiteur +50 tr/min",
         "description":  "Releve le limiteur de regime de +50 tr/min (delta sur la valeur du fichier).",
+        "group":  "limiter",
         "software":  [
                          "430037",
                          "430055",
@@ -90,6 +91,7 @@
         "id":  "limiter_100",
         "name":  "Limiteur +100 tr/min",
         "description":  "Releve le limiteur de regime de +100 tr/min (delta sur la valeur du fichier).",
+        "group":  "limiter",
         "software":  [
                          "430037",
                          "430055",
@@ -177,6 +179,7 @@
         "id":  "limiter_200",
         "name":  "Limiteur +200 tr/min",
         "description":  "Releve le limiteur de regime de +200 tr/min (delta sur la valeur du fichier).",
+        "group":  "limiter",
         "software":  [
                          "430037",
                          "430055",
@@ -264,6 +267,7 @@
         "id":  "limiter_300",
         "name":  "Limiteur +300 tr/min",
         "description":  "Releve le limiteur de regime de +300 tr/min (delta sur la valeur du fichier).",
+        "group":  "limiter",
         "software":  [
                          "430037",
                          "430055",
