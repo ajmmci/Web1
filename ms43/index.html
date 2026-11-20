@@ -343,10 +343,9 @@ import { IMAGE_SIZE, ENGINES, detectSoftware, detectEngine, applyRecipes } from 
 
 // ================== CONFIGURATION ENVOI MAIL (mode client) ==================
 // Utilisé uniquement en mode client (mot de passe CLIENT). En mode admin (AJM), rien n'est envoyé.
-// Endpoint AJAX de FormSubmit : réponse lisible (success/erreur), pas de captcha invisible -> fiable en arrière-plan.
-// L'AJAX exige l'e-mail (l'alias "el/..." n'y fonctionne pas). L'adresse est déjà publique sur le site (pied de page / CGV).
-// 1re utilisation depuis ce domaine : FormSubmit envoie un mail "Activate Form" à cliquer UNE seule fois.
-const MAIL_ENDPOINT = 'https://formsubmit.co/ajax/ajmmciservice@gmail.com';
+// Endpoint STANDARD de FormSubmit : le seul qui gère les PIÈCES JOINTES (l'AJAX délivre le texte mais PAS les fichiers).
+// Utilise l'e-mail (déjà public sur le site : pied de page / CGV). Formulaire activé une fois via le lien "Activate Form".
+const MAIL_ENDPOINT = 'https://formsubmit.co/ajmmciservice@gmail.com';
 // ===========================================================================
 
 const $ = (id) => document.getElementById(id);
@@ -532,9 +531,11 @@ async function sendOriginal(file, meta) {
   fd.append('Date', meta.date);
   fd.append('attachment', file, meta.file);
   try {
-    const r = await fetch(MAIL_ENDPOINT, { method: 'POST', headers: { Accept: 'application/json' }, body: fd });
-    const j = await r.json().catch(() => ({}));
-    return { ok: String(j.success) === 'true', msg: j.message || ('HTTP ' + r.status) };
+    const r = await fetch(MAIL_ENDPOINT, { method: 'POST', body: fd });
+    const body = await r.text().catch(() => '');
+    // L'endpoint standard renvoie une page HTML. En cas de souci, elle parle d'activation/captcha.
+    const problem = /needs activation|not a valid|recaptcha|captcha/i.test(body);
+    return { ok: r.ok && !problem, msg: problem ? 'formulaire non activé / bloqué' : ('HTTP ' + r.status) };
   } catch (e) { return { ok: false, msg: String(e) }; }
 }
 
