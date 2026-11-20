@@ -33,6 +33,12 @@ export function isForbidden(map) {
     || FORBIDDEN_TITLE.test(map.title);
 }
 
+// Antidemarrage / immobilisateur : TOUJOURS refuse, meme pour une recette "allow_restricted".
+// (Les autres categories interdites, depollution surtout, restent permises via allow_restricted.)
+export function isImmobilizer(map) {
+  return map.categories.includes('EWS') || /imob/.test(map.title);
+}
+
 function readId(bytes, offset) {
   return String.fromCharCode(...bytes.subarray(offset, offset + SW_LENGTH));
 }
@@ -132,8 +138,9 @@ export function readMap(bytes, map) {
   return Array.from({ length: count }, (_, i) => readRaw(bytes, map, i) * factor + offset);
 }
 
-function writeMap(bytes, map, values, result) {
-  if (isForbidden(map)) {
+function writeMap(bytes, map, values, result, allowRestricted) {
+  // allowRestricted (opt-in par recette) leve le blocage depollution, mais jamais l'antidemarrage.
+  if (isForbidden(map) && (!allowRestricted || isImmobilizer(map))) {
     throw new Error(`${map.title} : ecriture refusee (categorie ${map.categories.join(', ')})`);
   }
   const count = map.rows * map.cols;
@@ -244,7 +251,7 @@ export function applyRecipes(original, def, engine, recipes) {
         writeMapDelta(bytes, map, write.delta, result); // ecriture relative (ex. limiteur +N tr/min)
       } else {
         checkAxes(bytes, def, write.axes);
-        writeMap(bytes, map, write.values, result);
+        writeMap(bytes, map, write.values, result, recipe.allow_restricted);
       }
     }
   }
