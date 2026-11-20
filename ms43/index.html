@@ -432,7 +432,7 @@ const recName = (r) => (window.AJM.lang === 'en' && RNAME_EN[r.name]) || r.name;
 const recDesc = (r) => (window.AJM.lang === 'en' && RDESC_EN[r.description]) || r.description || '';
 
 let bytes = null, fileName = '', originalFile = null, sw = null, allRecipes = [], shown = [], lastOutput = null;
-let engineChoice = '', lastResult = null, lastEngine = '';
+let engineChoice = '', lastResult = null, lastEngine = '', outName = '';
 
 // --- Chargement du catalogue de recettes (manifeste extensible) ---
 const catalogue = (async () => {
@@ -529,6 +529,26 @@ const CAT_ORDER = ['rpm', 'fuel', 'misc', 'depol', 'other'];
 const catOf = (r) => CAT_OF[r.id] || 'other';
 const numIn = (s) => { const m = String(s).match(/\d+/); return m ? +m[0] : 0; };
 const optLabel = (r) => { const m = recName(r).match(/[+\-]\s?\d+/); return m ? m[0].replace(/\s/g, '') : recName(r); };
+
+// Tag court par recette pour nommer le fichier telecharge (independant de la langue).
+const TAG_OF = {
+  e85_coldstart_idle: 'E85', fuel_hardcut: 'Hardcut', hard_cut: 'Hardcut',
+  aa_98: 'AA98', vanos_ae: 'VANOS', idle_haut: 'RalentiHaut', pedale_lineaire: 'PedaleLin',
+  thermostat_90: 'Thermo90', ignition_cut: 'IgnCut', maf_load: 'MAFload',
+  o2_rear_off: 'O2off', cat_heating_off: 'CatHeatOff',
+};
+function tagOf(r) {
+  if (r.group === 'limiter') { const m = String(r.name).match(/\+(\d+)/); return m ? ('+' + m[1] + 'rpm') : 'limiter'; }
+  if (TAG_OF[r.id]) return TAG_OF[r.id];
+  return (String(r.name).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9+]+/g, '') || 'mod').slice(0, 16);
+}
+// Nom de sortie : <origine>_AJM_<tag1>_<tag2>...bin (caracteres de fichier invalides retires).
+function buildOutName(name, chosen) {
+  const base = name.replace(/\.bin$/i, '');
+  const tags = chosen.map(tagOf).filter(Boolean);
+  const full = base + '_AJM_' + tags.join('_');
+  return full.replace(/[\\/:*?"<>|]+/g, '').replace(/\s+/g, '_') + '.bin';
+}
 
 // Selecteur Off/On d'une recette (case cachee = etat reel lu par "Appliquer").
 function segSingle(i, on) {
@@ -659,6 +679,7 @@ $('apply').addEventListener('click', async () => {
     const result = applyRecipes(bytes, fullDef, engine, chosen);
     lastOutput = result.bytes;
     lastResult = result; lastEngine = engine;
+    outName = buildOutName(fileName, chosen); // nom = origine + AJM + modifs choisies
     showReport(result, engine);
     download(result.bytes);
     $('applyMsg').innerHTML = badge(mode === 'admin' ? T('applied_detail', result.changes.length) : T('applied_ok'), 'ok');
@@ -704,7 +725,7 @@ function download(data) {
   const blob = new Blob([data], { type: 'application/octet-stream' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = fileName.replace(/\.bin$/i, '') + '_modifie.bin';
+  a.download = outName || (fileName.replace(/\.bin$/i, '') + '_modifie.bin');
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
