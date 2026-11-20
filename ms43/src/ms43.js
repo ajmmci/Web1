@@ -4,6 +4,7 @@
 // Les checksums ne sont pas touches : le flasher les corrige a l'ecriture.
 
 export const IMAGE_SIZE = 0x80000;
+export const BASEOFFSET = 0x70000; // debut de la zone calibration ; en dessous = zone programme (code)
 export const SW_OFFSET = 0x70042;
 export const PROGRAM_SW_OFFSET = 0x6ffba;
 export const SW_LENGTH = 6;
@@ -162,6 +163,31 @@ function writeMap(bytes, map, values, result) {
   });
 }
 
+// Ecriture par delta : ajoute delta[i] (unite physique) a la valeur courante de chaque case.
+// Portable (soft/moteur) car relatif au fichier ; pas de controle d'axes (on ajoute a l'existant).
+function writeMapDelta(bytes, map, deltas, result) {
+  if (isForbidden(map)) {
+    throw new Error(`${map.title} : ecriture refusee (categorie ${map.categories.join(', ')})`);
+  }
+  const count = map.rows * map.cols;
+  if (!Array.isArray(deltas) || deltas.length !== count) throw new Error(`${map.title} : ${count} delta(s) attendu(s)`);
+  if (!deltas.every(Number.isFinite)) throw new Error(`${map.title} : delta non numerique`);
+
+  const { factor, offset } = scaling(map);
+  deltas.forEach((delta, i) => {
+    if (delta === 0) return;
+    const beforeRaw = readRaw(bytes, map, i);
+    const beforePhys = beforeRaw * factor + offset;
+    const afterRaw = Math.round((beforePhys + delta - offset) / factor);
+    if (afterRaw === beforeRaw) return;
+    writeRaw(bytes, map, i, afterRaw);
+    result.changes.push({
+      map: map.title, index: i, file_offset: elementOffset(map, i),
+      before: beforePhys, after: afterRaw * factor + offset, units: map.units,
+    });
+  });
+}
+
 // Une table n'a de sens qu'avec ses axes : si ceux du fichier different de la reference, on refuse.
 function checkAxes(bytes, def, axes) {
   for (const axis of axes ?? []) {
@@ -174,7 +200,25 @@ function checkAxes(bytes, def, axes) {
   }
 }
 
+// Patch brut : { name, software, engines, patch: [[offset, avant, apres], ...] }.
+// Octets de la zone programme (< BASEOFFSET) : on verifie "avant" et on refuse si le code differe
+// (securite : mauvaise version SW). Zone calibration : ecriture directe. Octet deja a "apres" : ignore.
+function applyPatch(bytes, recipe, result) {
+  for (const entry of recipe.patch) {
+    const [o, before, after] = entry;
+    if (!Number.isInteger(o) || o < 0 || o >= bytes.length) throw new Error(`Patch "${recipe.name}" : adresse ${o} hors du fichier`);
+    const cur = bytes[o];
+    if (cur === after) continue;
+    if (o < BASEOFFSET && cur !== before) {
+      throw new Error(`Patch "${recipe.name}" incompatible avec ce fichier (code programme different) : SW / base non supporte`);
+    }
+    bytes[o] = after;
+    result.changes.push({ map: '(patch)', index: o, file_offset: o, before: cur, after, units: '' });
+  }
+}
+
 // Recette : { name, software: ['430069'], engines: ['B30'], writes: [{ map: 'nom_xdf', values: [...], axes: [...] }] }
+//   ou patch brut : { ..., patch: [[offset, avant, apres], ...] } (octets cibles, sans map nommee).
 // Valeurs en unites physiques. Toute erreur annule l'ensemble : pas de fichier partiellement modifie.
 export function applyRecipes(original, def, engine, recipes) {
   const detected = detectSoftware(original);
@@ -190,11 +234,18 @@ export function applyRecipes(original, def, engine, recipes) {
   for (const recipe of recipes) {
     if (!recipe.software.includes(def.software)) throw new Error(`Recette "${recipe.name}" non prevue pour le SW ${def.software}`);
     if (!recipe.engines.includes(engine)) throw new Error(`Recette "${recipe.name}" non prevue pour ${engine}`);
-    for (const { map: title, values, axes } of recipe.writes) {
+    if (recipe.patch) { applyPatch(bytes, recipe, result); continue; }
+    for (const write of recipe.writes) {
+      const title = write.map;
       if (written.has(title)) throw new Error(`Map "${title}" ecrite par plusieurs recettes`);
       written.add(title);
-      checkAxes(bytes, def, axes);
-      writeMap(bytes, findMap(def, title), values, result);
+      const map = findMap(def, title);
+      if (write.delta) {
+        writeMapDelta(bytes, map, write.delta, result); // ecriture relative (ex. limiteur +N tr/min)
+      } else {
+        checkAxes(bytes, def, write.axes);
+        writeMap(bytes, map, write.values, result);
+      }
     }
   }
   return result;
