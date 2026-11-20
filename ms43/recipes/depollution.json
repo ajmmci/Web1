@@ -1,0 +1,257 @@
+[
+    {
+        "id":  "o2_rear_off",
+        "name":  "Desactivation sondes arriere",
+        "description":  "Desactive les sondes lambda arriere (controle catalyseur). Usage hors route / competition.",
+        "software":  [
+                         "430066",
+                         "430069"
+                     ],
+        "engines":  [
+                        "B22",
+                        "B25",
+                        "B30"
+                    ],
+        "allow_restricted":  true,
+        "source":  "430069 EU2 : Siemens_MS43_MS430069_E46_M54B30_EU2_LHD_02off_Désactivationsondearr.bin",
+        "writes":  [
+                       {
+                           "map":  "c_abc_inc_vls_down",
+                           "values":  [
+                                          0
+                                      ],
+                           "axes":  [
+
+                                    ]
+                       },
+                       {
+                           "map":  "c_abc_max_vls_down_post_puc",
+                           "values":  [
+                                          250
+                                      ],
+                           "axes":  [
+
+                                    ]
+                       },
+                       {
+                           "map":  "c_abc_max_vls_down_t",
+                           "values":  [
+                                          250
+                                      ],
+                           "axes":  [
+
+                                    ]
+                       },
+                       {
+                           "map":  "c_conf_cat",
+                           "values":  [
+                                          1
+                                      ],
+                           "axes":  [
+
+                                    ]
+                       },
+                       {
+                           "map":  "lc_diag_actchk_vls_down_ready",
+                           "values":  [
+                                          0
+                                      ],
+                           "axes":  [
+
+                                    ]
+                       }
+                   ]
+    },
+    {
+        "id":  "cat_heating_off",
+        "name":  "Desactivation chauffe catalyseur",
+        "description":  "Desactive la chauffe du catalyseur au demarrage. Usage hors route / competition.",
+        "software":  [
+                         "430037",
+                         "430055",
+                         "430056",
+                         "430064",
+                         "430066",
+                         "430069"
+                     ],
+        "engines":  [
+                        "B22",
+                        "B25",
+                        "B30"
+                    ],
+        "allow_restricted":  true,
+        "source":  "430069 EU2 : Siemens_MS43_MS430069_E46_M54B30_EU2_LHD_CatHeating_Off.bin",
+        "writes":  [
+                       {
+                           "map":  "c_n_max_ch_3",
+                           "values":  [
+                                          0
+                                      ],
+                           "axes":  [
+
+                                    ]
+                       },
+                       {
+                           "map":  "c_vs_max_ch_3",
+                           "values":  [
+                                          0
+                                      ],
+                           "axes":  [
+
+                                    ]
+                       },
+                       {
+                           "map":  "id_t_ch_ti_cat_var__tco_st",
+                           "values":  [
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0
+                                      ],
+                           "axes":  [
+
+                                    ]
+                       },
+                       {
+                           "map":  "id_t_iga_ch_cat_var__tco_st",
+                           "values":  [
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0
+                                      ],
+                           "axes":  [
+
+                                    ]
+                       },
+                       {
+                           "map":  "ip_t_ch_2__tco_st__km_ctr",
+                           "values":  [
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0
+                                      ],
+                           "axes":  [
+
+                                    ]
+                       },
+                       {
+                           "map":  "ip_t_ch_ti__tco_st__km_ctr",
+                           "values":  [
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0
+                                      ],
+                           "axes":  [
+
+                                    ]
+                       },
+                       {
+                           "map":  "ip_t_iga_ch__tco_st__km_ctr",
+                           "values":  [
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                          0
+                                      ],
+                           "axes":  [
+
+                                    ]
+                       }
+                   ]
+    }
+]
