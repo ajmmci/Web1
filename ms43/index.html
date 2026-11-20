@@ -63,7 +63,7 @@
   .note li { margin: 3px 0; }
   .hist-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
   .hist-head h2 { margin: 0; }
-  .hidden { display: none; }
+  .hidden { display: none !important; }
   /* Sélecteur de langue (pilule en haut à droite, visible aussi par-dessus le rideau). */
   .lang { position: fixed; top: 12px; right: 12px; z-index: 10001; display: flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--card); box-shadow: var(--shadow); }
   .lang button { border: 0; border-radius: 0; padding: 6px 13px; background: transparent; font-size: 13px; font-weight: 700; color: var(--muted); }
@@ -162,6 +162,7 @@ window.AJM = (function () {
       need_one: 'coche au moins une modification',
       disclaimer_text: 'Je comprends que ces modifications sont appliquées sous ma seule responsabilité, à mes risques, et qu\'AJM ne peut être tenu responsable d\'éventuels dommages.',
       disclaimer_need: 'Coche la case de responsabilité pour continuer.',
+      orig_note: '⚠ Les modifications ne fonctionnent que sur une <b>lecture d\'origine</b> (fichier d\'usine non modifié). N\'importe pas un fichier déjà retouché.',
       applied_ok: 'Fichier téléchargé',
       applied_detail: function (n) { return n + ' cartographies modifiées'; },
       report_line: function (eng, n) { return 'Moteur <b>' + eng + '</b> — <b>' + n + '</b> cartographies modifiées. Le fichier a été téléchargé.'; },
@@ -231,6 +232,7 @@ window.AJM = (function () {
       need_one: 'tick at least one modification',
       disclaimer_text: 'I understand these modifications are applied under my sole responsibility, at my own risk, and that AJM cannot be held liable for any damage.',
       disclaimer_need: 'Tick the liability box to continue.',
+      orig_note: '⚠ Modifications only work on a <b>stock original read</b> (unmodified factory file). Don\'t import a file that has already been tuned.',
       applied_ok: 'File downloaded',
       applied_detail: function (n) { return n + ' maps modified'; },
       report_line: function (eng, n) { return 'Engine <b>' + eng + '</b> — <b>' + n + '</b> maps modified. The file has been downloaded.'; },
@@ -314,6 +316,7 @@ window.AJM = (function () {
       <div id="fname" class="fname"></div>
     </div>
     <input id="file" type="file" accept=".bin,application/octet-stream" class="hidden">
+    <div id="origNote" class="banner warn hidden" style="margin-top:12px" data-i18n="orig_note">Les modifications ne fonctionnent que sur une lecture d'origine.</div>
   </section>
 
   <section id="detectCard" class="card hidden">
@@ -396,6 +399,7 @@ function renderMode() {
   $('historyCard').classList.toggle('hidden', mode !== 'client');  // historique : client seulement
   $('noteSend').classList.toggle('hidden', mode !== 'client');     // mention "envoi à AJM" : client seulement
   $('disclaimer').classList.toggle('hidden', mode !== 'client');   // case responsabilite : client seulement
+  $('origNote').classList.toggle('hidden', mode !== 'client');     // note "fichier d'origine" : client seulement
   renderHistory();
 }
 
