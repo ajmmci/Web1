@@ -114,7 +114,7 @@ window.AJM = (function () {
       note_send: 'Ta lecture d\'origine est envoyée à AJM au moment de la demande, pour préparer ta cartographie.',
       note_1: 'Les sommes de contrôle ne sont pas recalculées ici&nbsp;: utilise un flasher qui les corrige à l\'écriture.',
       note_2: 'Les valeurs des modifications proviennent de fichiers de référence&nbsp;; elles doivent être validées sur banc ou sur un calculateur de test avant tout usage.',
-      note_3: 'Les fonctions de dépollution et l\'antidémarrage (EWS) ne sont pas proposés.',
+      note_3: 'L\'antidémarrage (EWS) n\'est pas proposé. Les fonctions de dépollution sont réservées à un usage hors route / compétition.',
       note_4: 'L\'original n\'est jamais modifié&nbsp;: le fichier téléchargé est une copie.',
       bytes: function (s) { return s + ' octets'; },
       bad_size_badge: 'taille invalide',
@@ -133,6 +133,7 @@ window.AJM = (function () {
       info_none: function (eng, def) { return 'Aucune modification disponible pour le moteur ' + eng + ' sur le SW ' + def + ' pour le moment.'; },
       info_ready: function (def, eng) { return 'SW ' + def + ', moteur ' + eng + ' — coche les modifications à appliquer.'; },
       maps_count: function (n) { return n + ' cartographie(s)'; },
+      patch_count: function (n) { return n + ' octet(s) (patch programme)'; },
       need_one: 'coche au moins une modification',
       applied_ok: 'Fichier téléchargé',
       applied_detail: function (n) { return n + ' cartographies modifiées'; },
@@ -177,7 +178,7 @@ window.AJM = (function () {
       note_send: 'Your original read is sent to AJM when you submit the request, to prepare your tune.',
       note_1: 'Checksums are not recalculated here&nbsp;: use a flasher that corrects them on write.',
       note_2: 'Modification values come from reference files&nbsp;; they must be validated on a bench or a test ECU before any use.',
-      note_3: 'Emissions functions and the immobiliser (EWS) are not offered.',
+      note_3: 'The immobiliser (EWS) is not offered. Emissions functions are for off-road / motorsport use only.',
       note_4: 'The original is never modified&nbsp;: the downloaded file is a copy.',
       bytes: function (s) { return s + ' bytes'; },
       bad_size_badge: 'invalid size',
@@ -196,6 +197,7 @@ window.AJM = (function () {
       info_none: function (eng, def) { return 'No modification available for the ' + eng + ' engine on SW ' + def + ' yet.'; },
       info_ready: function (def, eng) { return 'SW ' + def + ', ' + eng + ' engine — tick the modifications to apply.'; },
       maps_count: function (n) { return n + ' map(s)'; },
+      patch_count: function (n) { return n + ' byte(s) (program patch)'; },
       need_one: 'tick at least one modification',
       applied_ok: 'File downloaded',
       applied_detail: function (n) { return n + ' maps modified'; },
@@ -373,6 +375,15 @@ const RNAME_EN = {
   'Ralenti haut': 'High idle',
   'Pedale lineaire': 'Linear throttle',
   'Thermostat 90 C': 'Thermostat 90 °C',
+  'Limiteur +50 tr/min': 'Rev limit +50 rpm',
+  'Limiteur +100 tr/min': 'Rev limit +100 rpm',
+  'Limiteur +200 tr/min': 'Rev limit +200 rpm',
+  'Limiteur +300 tr/min': 'Rev limit +300 rpm',
+  'Coupe carburant au limiteur': 'Fuel cut at rev limit',
+  'Coupe allumage au limiteur (patch)': 'Ignition cut at rev limit (patch)',
+  'Enrichissement pleine charge (MAF)': 'Full-load enrichment (MAF)',
+  'Desactivation sondes arriere': 'Rear O2 sensors off',
+  'Desactivation chauffe catalyseur': 'Catalyst heating off',
 };
 const RDESC_EN = {
   'Adaptation E85 : enrichissement, demarrage a froid et ralenti.': 'E85 adaptation: enrichment, cold start and idle.',
@@ -384,6 +395,15 @@ const RDESC_EN = {
   'Augmente le regime de ralenti.': 'Raises the idle speed.',
   'Reponse lineaire de la pedale d accelerateur.': 'Linear accelerator pedal response.',
   'Abaisse la consigne de temperature du thermostat electrique a 90 C (valeurs copiees du B30).': 'Lowers the electric thermostat temperature target to 90 °C (values copied from the B30).',
+  'Releve le limiteur de regime de +50 tr/min (delta sur la valeur du fichier).': 'Raises the rev limit by +50 rpm (delta on the file\'s value).',
+  'Releve le limiteur de regime de +100 tr/min (delta sur la valeur du fichier).': 'Raises the rev limit by +100 rpm (delta on the file\'s value).',
+  'Releve le limiteur de regime de +200 tr/min (delta sur la valeur du fichier).': 'Raises the rev limit by +200 rpm (delta on the file\'s value).',
+  'Releve le limiteur de regime de +300 tr/min (delta sur la valeur du fichier).': 'Raises the rev limit by +300 rpm (delta on the file\'s value).',
+  "Coupe l'injection au limiteur (hard cut).": 'Cuts fuel injection at the rev limit (hard cut).',
+  'Patch de coupe d allumage au limiteur. SW 430069 / B30 uniquement.': 'Ignition cut patch at the rev limit. SW 430069 / B30 only.',
+  'Enrichissement a pleine charge via le debitmetre (MAF). SW 430069 / B30 uniquement.': 'Full-load enrichment via the MAF. SW 430069 / B30 only.',
+  'Desactive les sondes lambda arriere (controle catalyseur). Usage hors route / competition. SW 430069 / B30.': 'Disables the rear lambda sensors (catalyst monitoring). Off-road / motorsport use. SW 430069 / B30.',
+  'Desactive la chauffe du catalyseur au demarrage. Usage hors route / competition. SW 430069 / B30.': 'Disables catalyst heating at start-up. Off-road / motorsport use. SW 430069 / B30.',
 };
 const recName = (r) => (window.AJM.lang === 'en' && RNAME_EN[r.name]) || r.name;
 const recDesc = (r) => (window.AJM.lang === 'en' && RDESC_EN[r.description]) || r.description || '';
@@ -507,7 +527,7 @@ async function buildRecipes() {
       <span>
         <span class="t">${esc(recName(r))}</span>
         <span class="d">${esc(recDesc(r))}</span>
-        <span class="m">${T('maps_count', r.writes.length)}</span>
+        <span class="m">${r.patch ? T('patch_count', r.patch.length) : T('maps_count', r.writes.length)}</span>
       </span>
     </label>`).join('');
 }
