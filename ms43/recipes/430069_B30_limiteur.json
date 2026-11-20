@@ -1,0 +1,387 @@
+[
+    {
+        "id":  "limiter_50",
+        "name":  "Limiteur +50 tr/min",
+        "description":  "Releve le limiteur de regime de +50 tr/min (delta sur la valeur du fichier).",
+        "software":  [
+                         "430037",
+                         "430055",
+                         "430056",
+                         "430064",
+                         "430066",
+                         "430069"
+                     ],
+        "engines":  [
+                        "B22",
+                        "B25",
+                        "B30"
+                    ],
+        "source":  "430069 EU2 : Siemens_MS43_MS430069_E46_M54B30_EU2_LHD_+50tr.bin",
+        "writes":  [
+                       {
+                           "map":  "id_n_max_at__gear",
+                           "delta":  [
+                                         64,
+                                         64,
+                                         64,
+                                         64,
+                                         64,
+                                         64
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_max_at__gear",
+                           "delta":  [
+                                         64,
+                                         64,
+                                         64,
+                                         64,
+                                         64,
+                                         64
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_max_mt__gear",
+                           "delta":  [
+                                         64,
+                                         64,
+                                         64,
+                                         64,
+                                         64,
+                                         64
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_mt__gear",
+                           "delta":  [
+                                         64,
+                                         64,
+                                         64,
+                                         64,
+                                         64,
+                                         64
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_vs_max_at__gear",
+                           "delta":  [
+                                         50,
+                                         50,
+                                         50,
+                                         50,
+                                         50,
+                                         50
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_vs_max_mt__gear",
+                           "delta":  [
+                                         50,
+                                         50,
+                                         50,
+                                         50,
+                                         50,
+                                         50
+                                     ]
+                       }
+                   ]
+    },
+    {
+        "id":  "limiter_100",
+        "name":  "Limiteur +100 tr/min",
+        "description":  "Releve le limiteur de regime de +100 tr/min (delta sur la valeur du fichier).",
+        "software":  [
+                         "430037",
+                         "430055",
+                         "430056",
+                         "430064",
+                         "430066",
+                         "430069"
+                     ],
+        "engines":  [
+                        "B22",
+                        "B25",
+                        "B30"
+                    ],
+        "source":  "430069 EU2 : Siemens_MS43_MS430069_E46_M54B30_EU2_LHD_+100tr.bin",
+        "writes":  [
+                       {
+                           "map":  "id_n_max_at__gear",
+                           "delta":  [
+                                         128,
+                                         128,
+                                         128,
+                                         128,
+                                         128,
+                                         128
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_max_at__gear",
+                           "delta":  [
+                                         128,
+                                         128,
+                                         128,
+                                         128,
+                                         128,
+                                         128
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_max_mt__gear",
+                           "delta":  [
+                                         128,
+                                         128,
+                                         128,
+                                         128,
+                                         128,
+                                         128
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_mt__gear",
+                           "delta":  [
+                                         128,
+                                         128,
+                                         128,
+                                         128,
+                                         128,
+                                         128
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_vs_max_at__gear",
+                           "delta":  [
+                                         100,
+                                         100,
+                                         100,
+                                         100,
+                                         100,
+                                         100
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_vs_max_mt__gear",
+                           "delta":  [
+                                         100,
+                                         100,
+                                         100,
+                                         100,
+                                         100,
+                                         100
+                                     ]
+                       }
+                   ]
+    },
+    {
+        "id":  "limiter_200",
+        "name":  "Limiteur +200 tr/min",
+        "description":  "Releve le limiteur de regime de +200 tr/min (delta sur la valeur du fichier).",
+        "software":  [
+                         "430037",
+                         "430055",
+                         "430056",
+                         "430064",
+                         "430066",
+                         "430069"
+                     ],
+        "engines":  [
+                        "B22",
+                        "B25",
+                        "B30"
+                    ],
+        "source":  "430069 EU2 : Siemens_MS43_MS430069_E46_M54B30_EU2_LHD_+200tr.bin",
+        "writes":  [
+                       {
+                           "map":  "id_n_max_at__gear",
+                           "delta":  [
+                                         224,
+                                         224,
+                                         224,
+                                         224,
+                                         224,
+                                         224
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_max_at__gear",
+                           "delta":  [
+                                         224,
+                                         224,
+                                         224,
+                                         224,
+                                         224,
+                                         224
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_max_mt__gear",
+                           "delta":  [
+                                         224,
+                                         224,
+                                         224,
+                                         224,
+                                         224,
+                                         224
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_mt__gear",
+                           "delta":  [
+                                         224,
+                                         224,
+                                         224,
+                                         224,
+                                         224,
+                                         224
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_vs_max_at__gear",
+                           "delta":  [
+                                         200,
+                                         200,
+                                         200,
+                                         200,
+                                         200,
+                                         200
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_vs_max_mt__gear",
+                           "delta":  [
+                                         200,
+                                         200,
+                                         200,
+                                         200,
+                                         200,
+                                         200
+                                     ]
+                       }
+                   ]
+    },
+    {
+        "id":  "limiter_300",
+        "name":  "Limiteur +300 tr/min",
+        "description":  "Releve le limiteur de regime de +300 tr/min (delta sur la valeur du fichier).",
+        "software":  [
+                         "430037",
+                         "430055",
+                         "430056",
+                         "430064",
+                         "430066",
+                         "430069"
+                     ],
+        "engines":  [
+                        "B22",
+                        "B25",
+                        "B30"
+                    ],
+        "source":  "430069 EU2 : Siemens_MS43_MS430069_E46_M54B30_EU2_LHD_+300tr.bin",
+        "writes":  [
+                       {
+                           "map":  "id_n_max_at__gear",
+                           "delta":  [
+                                         320,
+                                         320,
+                                         320,
+                                         320,
+                                         320,
+                                         320
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_max_at__gear",
+                           "delta":  [
+                                         320,
+                                         320,
+                                         320,
+                                         320,
+                                         320,
+                                         320
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_max_mt__gear",
+                           "delta":  [
+                                         320,
+                                         320,
+                                         320,
+                                         320,
+                                         320,
+                                         320
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_mt__gear",
+                           "delta":  [
+                                         224,
+                                         320,
+                                         320,
+                                         320,
+                                         320,
+                                         320
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_vs_max_at__gear",
+                           "delta":  [
+                                         300,
+                                         300,
+                                         300,
+                                         300,
+                                         300,
+                                         300
+                                     ]
+                       },
+                       {
+                           "map":  "id_n_max_vs_max_mt__gear",
+                           "delta":  [
+                                         300,
+                                         300,
+                                         300,
+                                         300,
+                                         300,
+                                         300
+                                     ]
+                       }
+                   ]
+    },
+    {
+        "id":  "fuel_hardcut",
+        "name":  "Coupe carburant au limiteur",
+        "description":  "Coupe l\u0027injection au limiteur (hard cut).",
+        "software":  [
+                         "430037",
+                         "430055",
+                         "430056",
+                         "430064",
+                         "430066",
+                         "430069"
+                     ],
+        "engines":  [
+                        "B30"
+                    ],
+        "source":  "430069 EU2 : Siemens_MS43_MS430069_E46_M54B30_EU2_LHD_Fuel_HardCut.bin",
+        "writes":  [
+                       {
+                           "map":  "c_n_max_hys",
+                           "values":  [
+                                          0
+                                      ],
+                           "axes":  [
+
+                                    ]
+                       },
+                       {
+                           "map":  "c_n_max_hys_max",
+                           "values":  [
+                                          32
+                                      ],
+                           "axes":  [
+
+                                    ]
+                       }
+                   ]
+    }
+]
