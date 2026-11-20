@@ -364,6 +364,8 @@
                          "430069"
                      ],
         "engines":  [
+                        "B22",
+                        "B25",
                         "B30"
                     ],
         "source":  "430069 EU2 : Siemens_MS43_MS430069_E46_M54B30_EU2_LHD_Fuel_HardCut.bin",
