@@ -9,16 +9,18 @@
   :root {
     --bg: #f4f4f4; --card: #ffffff; --ink: #1a1a1a; --muted: #5f6672; --line: #e3e3e3;
     --accent: #007BFF; --accent-ink: #ffffff; --ok: #1a7d33; --warn: #9a5b08; --err: #c22323;
-    --ok-bg: #e7f4ec; --warn-bg: #fbeede; --err-bg: #fbe6e6; --shadow: 0 1px 3px rgba(0,0,0,.1);
+    --ok-bg: #e7f4ec; --warn-bg: #fbeede; --err-bg: #fbe6e6; --shadow: 0 2px 10px rgba(20,30,50,.07);
+    --orange: #FF7500; --seg-bg: #eef1f5;
     --brand-grad: linear-gradient(135deg, #007BFF, #FF7500);
   }
   * { box-sizing: border-box; }
   html, body { background: var(--bg); }
   body { margin: 0; color: var(--ink); font: 15px/1.6 Arial, "Helvetica Neue", Helvetica, sans-serif; }
   main { max-width: 760px; margin: 0 auto; padding: 28px 16px 72px; }
-  header { text-align: center; }
-  header h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -.01em; }
-  header p { color: var(--muted); margin: 0 auto 22px; max-width: 560px; font-size: 13.5px; }
+  header { margin-bottom: 18px; }
+  .hero { background: var(--brand-grad); border-radius: 16px; padding: 26px 22px; text-align: center; box-shadow: var(--shadow); }
+  header h1 { color: #fff; font-size: 24px; margin: 0 0 6px; letter-spacing: -.01em; }
+  header p { color: #fff; opacity: .92; margin: 0 auto; max-width: 560px; font-size: 13.5px; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
   .card h2 { font-size: 15px; margin: 0 0 14px; display: flex; align-items: center; gap: 8px; }
   .step { display: inline-flex; width: 22px; height: 22px; border-radius: 50%; background: var(--brand-grad); color: #fff; font-size: 12px; font-weight: 700; align-items: center; justify-content: center; }
@@ -73,6 +75,24 @@
   #authGate input { width: 100%; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; margin-bottom: 10px; text-align: center; }
   #authGate button { width: 100%; }
   #authGate .err { color: var(--err); font-size: 13px; min-height: 18px; margin-top: 8px; }
+  /* Menus par categorie + selecteurs segmentes facon MHD */
+  .cat { border: 1px solid var(--line); border-radius: 12px; margin-bottom: 12px; background: var(--card); overflow: hidden; }
+  .cat-head { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 13px 16px; background: transparent; border: 0; border-radius: 0; font: inherit; font-weight: 700; font-size: 14px; color: var(--ink); cursor: pointer; }
+  .cat-head .chev { color: var(--orange); font-size: 12px; transition: transform .2s; }
+  .cat.closed .cat-head .chev { transform: rotate(-90deg); }
+  .cat.closed .cat-body { display: none; }
+  .cat-body { padding: 2px 16px 12px; }
+  .mod { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--line); }
+  .cat-body .mod:first-child { border-top: 0; }
+  .mod-head { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 190px; }
+  .mod-name { font-weight: 600; font-size: 14px; }
+  .mod-desc { color: var(--muted); font-size: 12.5px; }
+  .mod-meta { color: var(--muted); font-size: 11.5px; }
+  .seg { display: inline-flex; background: var(--seg-bg); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; flex: none; }
+  .seg-group { flex-wrap: wrap; }
+  .seg-opt { border: 0; background: transparent; border-radius: 999px; padding: 6px 13px; font: inherit; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; white-space: nowrap; transition: background .15s, color .15s; }
+  .seg-opt:hover { color: var(--ink); }
+  .seg-opt.on { background: var(--orange); color: #fff; }
 </style>
 <script>
 /* --- Internationalisation (FR / EN) --- partagée entre le rideau et l'application. */
@@ -93,6 +113,9 @@ window.AJM = (function () {
       k_sw: 'Version logiciel',
       k_engine: 'Base moteur',
       s3: 'Modifications',
+      seg_off: 'Off', seg_on: 'On',
+      group_limiter: 'Régime max',
+      cat_rpm: 'Régime & limiteur', cat_fuel: 'Carburant & moteur', cat_misc: 'Confort & divers', cat_depol: 'Dépollution (hors route)', cat_other: 'Divers',
       sel_all: 'Tout cocher',
       sel_none: 'Tout décocher',
       apply: 'Envoyer la demande et télécharger',
@@ -131,7 +154,7 @@ window.AJM = (function () {
       engine_choose_opt: '— choisir —',
       info_choose_engine: 'Choisis la base moteur pour voir les modifications disponibles.',
       info_none: function (eng, def) { return 'Aucune modification disponible pour le moteur ' + eng + ' sur le SW ' + def + ' pour le moment.'; },
-      info_ready: function (def, eng) { return 'SW ' + def + ', moteur ' + eng + ' — coche les modifications à appliquer.'; },
+      info_ready: function (def, eng) { return 'SW ' + def + ', moteur ' + eng + ' — choisis tes modifications.'; },
       maps_count: function (n) { return n + ' cartographie(s)'; },
       patch_count: function (n) { return n + ' octet(s) (patch programme)'; },
       need_one: 'coche au moins une modification',
@@ -157,6 +180,9 @@ window.AJM = (function () {
       k_sw: 'Software version',
       k_engine: 'Engine',
       s3: 'Modifications',
+      seg_off: 'Off', seg_on: 'On',
+      group_limiter: 'Rev limit',
+      cat_rpm: 'Rev limit & cut', cat_fuel: 'Fuel & engine', cat_misc: 'Comfort & misc', cat_depol: 'Emissions (off-road)', cat_other: 'Other',
       sel_all: 'Select all',
       sel_none: 'Clear all',
       apply: 'Send request and download',
@@ -195,7 +221,7 @@ window.AJM = (function () {
       engine_choose_opt: '— choose —',
       info_choose_engine: 'Choose the engine base to see the available modifications.',
       info_none: function (eng, def) { return 'No modification available for the ' + eng + ' engine on SW ' + def + ' yet.'; },
-      info_ready: function (def, eng) { return 'SW ' + def + ', ' + eng + ' engine — tick the modifications to apply.'; },
+      info_ready: function (def, eng) { return 'SW ' + def + ', ' + eng + ' engine — pick your modifications.'; },
       maps_count: function (n) { return n + ' map(s)'; },
       patch_count: function (n) { return n + ' byte(s) (program patch)'; },
       need_one: 'tick at least one modification',
@@ -270,7 +296,7 @@ window.AJM = (function () {
 <!-- Cible invisible pour l'envoi du fichier (évite toute navigation / problème CORS). -->
 <iframe id="fsSink" name="fs_sink" class="hidden"></iframe>
 <main>
-  <header>
+  <header class="hero">
     <h1>Service MS43</h1>
     <p id="headerP">Détection automatique de la version logiciel et application des modifications.</p>
   </header>
@@ -300,10 +326,7 @@ window.AJM = (function () {
 
   <section id="recipesCard" class="card hidden">
     <h2><span class="step">3</span> <span data-i18n="s3">Modifications</span></h2>
-    <div id="recipesInfo" class="note" style="margin-bottom:10px"></div>
-    <div id="selTools" class="sel-tools hidden">
-      <a id="selAll" data-i18n="sel_all">Tout cocher</a><a id="selNone" data-i18n="sel_none">Tout décocher</a>
-    </div>
+    <div id="recipesInfo" class="note" style="margin-bottom:12px"></div>
     <div id="recipes"></div>
     <div class="actions">
       <button id="apply" class="primary">Appliquer et télécharger</button>
@@ -402,8 +425,8 @@ const RDESC_EN = {
   "Coupe l'injection au limiteur (hard cut).": 'Cuts fuel injection at the rev limit (hard cut).',
   'Patch de coupe d allumage au limiteur. SW 430069 / B30 uniquement.': 'Ignition cut patch at the rev limit. SW 430069 / B30 only.',
   'Enrichissement a pleine charge via le debitmetre (MAF). SW 430069 / B30 uniquement.': 'Full-load enrichment via the MAF. SW 430069 / B30 only.',
-  'Desactive les sondes lambda arriere (controle catalyseur). Usage hors route / competition. SW 430069 / B30.': 'Disables the rear lambda sensors (catalyst monitoring). Off-road / motorsport use. SW 430069 / B30.',
-  'Desactive la chauffe du catalyseur au demarrage. Usage hors route / competition. SW 430069 / B30.': 'Disables catalyst heating at start-up. Off-road / motorsport use. SW 430069 / B30.',
+  'Desactive les sondes lambda arriere (controle catalyseur). Usage hors route / competition.': 'Disables the rear lambda sensors (catalyst monitoring). Off-road / motorsport use.',
+  'Desactive la chauffe du catalyseur au demarrage. Usage hors route / competition.': 'Disables catalyst heating at start-up. Off-road / motorsport use.',
 };
 const recName = (r) => (window.AJM.lang === 'en' && RNAME_EN[r.name]) || r.name;
 const recDesc = (r) => (window.AJM.lang === 'en' && RDESC_EN[r.description]) || r.description || '';
@@ -494,6 +517,46 @@ function showDetection() {
 
 function hideRecipes() { $('recipesCard').classList.add('hidden'); }
 
+// Categorie d'une recette (par id ; "other" sinon) -> menus par categorie facon MHD.
+const CAT_OF = {
+  limiter_50: 'rpm', limiter_100: 'rpm', limiter_200: 'rpm', limiter_300: 'rpm',
+  fuel_hardcut: 'rpm', hard_cut: 'rpm', ignition_cut: 'rpm', limiter_100rpm: 'rpm',
+  aa_98: 'fuel', e85_coldstart_idle: 'fuel', maf_load: 'fuel', vanos_ae: 'fuel',
+  idle_haut: 'misc', pedale_lineaire: 'misc', thermostat_90: 'misc',
+  o2_rear_off: 'depol', cat_heating_off: 'depol',
+};
+const CAT_ORDER = ['rpm', 'fuel', 'misc', 'depol', 'other'];
+const catOf = (r) => CAT_OF[r.id] || 'other';
+const numIn = (s) => { const m = String(s).match(/\d+/); return m ? +m[0] : 0; };
+const optLabel = (r) => { const m = recName(r).match(/[+\-]\s?\d+/); return m ? m[0].replace(/\s/g, '') : recName(r); };
+
+// Selecteur Off/On d'une recette (case cachee = etat reel lu par "Appliquer").
+function segSingle(i, on) {
+  return `<div class="seg seg-onoff">
+      <button type="button" class="seg-opt${on ? '' : ' on'}" data-on="0">${T('seg_off')}</button>
+      <button type="button" class="seg-opt${on ? ' on' : ''}" data-on="1">${T('seg_on')}</button>
+    </div><input type="checkbox" class="hidden" value="${i}"${on ? ' checked' : ''}>`;
+}
+function singleHtml(r, i, was) {
+  const meta = r.patch ? T('patch_count', r.patch.length) : T('maps_count', r.writes.length);
+  return `<div class="mod">
+      <div class="mod-head"><span class="mod-name">${esc(recName(r))}</span><span class="mod-desc">${esc(recDesc(r))}</span><span class="mod-meta">${meta}</span></div>
+      ${segSingle(i, was.has(String(i)))}
+    </div>`;
+}
+// Groupe (ex. limiteur) rendu en curseur : Off / +50 / +100 / ... (choix unique).
+function groupHtml(gid, members, was) {
+  members.sort((a, b) => numIn(a.r.name) - numIn(b.r.name));
+  const anyOn = members.some((m) => was.has(String(m.i)));
+  const opts = `<button type="button" class="seg-opt${anyOn ? '' : ' on'}" data-idx="">${T('seg_off')}</button>`
+    + members.map((m) => `<button type="button" class="seg-opt${was.has(String(m.i)) ? ' on' : ''}" data-idx="${m.i}">${esc(optLabel(m.r))}</button>`).join('');
+  const boxes = members.map((m) => `<input type="checkbox" class="hidden" value="${m.i}"${was.has(String(m.i)) ? ' checked' : ''}>`).join('');
+  return `<div class="mod">
+      <div class="mod-head"><span class="mod-name">${esc(T('group_' + gid))}</span></div>
+      <div class="seg seg-group">${opts}</div>${boxes}
+    </div>`;
+}
+
 async function buildRecipes() {
   $('reportCard').classList.add('hidden');
   $('applyMsg').textContent = '';
@@ -503,39 +566,53 @@ async function buildRecipes() {
   const box = $('recipes');
   allRecipes = await catalogue;
 
-  // Préserve les cases cochées lors d'un re-rendu (ex. changement de langue).
-  const wasChecked = new Set([...box.querySelectorAll('input:checked')].map((c) => c.value));
+  // Preserve les choix lors d'un re-rendu (ex. changement de langue), par index.
+  const was = new Set([...box.querySelectorAll('input:checked')].map((c) => c.value));
 
   $('recipesCard').classList.remove('hidden');
-  if (!engine) {
-    $('recipesInfo').textContent = T('info_choose_engine');
-    $('selTools').classList.add('hidden'); box.innerHTML = ''; $('apply').disabled = true;
-    return;
-  }
+  if (!engine) { $('recipesInfo').textContent = T('info_choose_engine'); box.innerHTML = ''; $('apply').disabled = true; return; }
   shown = allRecipes.filter((r) => r.software.includes(def) && r.engines.includes(engine));
-  if (shown.length === 0) {
-    $('recipesInfo').textContent = T('info_none', engine, def);
-    $('selTools').classList.add('hidden'); box.innerHTML = ''; $('apply').disabled = true;
-    return;
-  }
+  if (shown.length === 0) { $('recipesInfo').textContent = T('info_none', engine, def); box.innerHTML = ''; $('apply').disabled = true; return; }
   $('recipesInfo').textContent = T('info_ready', def, engine);
-  $('selTools').classList.remove('hidden');
   $('apply').disabled = false;
-  box.innerHTML = shown.map((r, i) => `
-    <label class="rec">
-      <input type="checkbox" value="${i}"${wasChecked.has(String(i)) ? ' checked' : ''}>
-      <span>
-        <span class="t">${esc(recName(r))}</span>
-        <span class="d">${esc(recDesc(r))}</span>
-        <span class="m">${r.patch ? T('patch_count', r.patch.length) : T('maps_count', r.writes.length)}</span>
-      </span>
-    </label>`).join('');
+
+  const items = shown.map((r, i) => ({ r, i }));
+  const byCat = {};
+  items.forEach((it) => { const c = catOf(it.r); (byCat[c] = byCat[c] || []).push(it); });
+  const parts = [];
+  for (const cat of CAT_ORDER) {
+    const list = byCat[cat];
+    if (!list) continue;
+    const grouped = {}; const singles = [];
+    list.forEach((it) => { if (it.r.group) { (grouped[it.r.group] = grouped[it.r.group] || []).push(it); } else { singles.push(it); } });
+    let bodyHtml = '';
+    Object.keys(grouped).forEach((g) => { bodyHtml += groupHtml(g, grouped[g], was); });
+    singles.forEach((it) => { bodyHtml += singleHtml(it.r, it.i, was); });
+    parts.push(`<section class="cat"><button type="button" class="cat-head"><span>${esc(T('cat_' + cat))}</span><span class="chev">&#9662;</span></button><div class="cat-body">${bodyHtml}</div></section>`);
+  }
+  box.innerHTML = parts.join('');
 }
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-$('selAll').onclick = () => document.querySelectorAll('#recipes input').forEach((c) => (c.checked = true));
-$('selNone').onclick = () => document.querySelectorAll('#recipes input').forEach((c) => (c.checked = false));
+// Interaction des selecteurs segmentes + repli des menus par categorie (delegation).
+$('recipes').addEventListener('click', (e) => {
+  const opt = e.target.closest('.seg-opt');
+  if (opt) {
+    const seg = opt.parentElement, mod = opt.closest('.mod');
+    seg.querySelectorAll('.seg-opt').forEach((o) => o.classList.remove('on'));
+    opt.classList.add('on');
+    if (seg.classList.contains('seg-group')) {
+      const idx = opt.getAttribute('data-idx');
+      mod.querySelectorAll('input[type=checkbox]').forEach((c) => { c.checked = (c.value === idx); });
+    } else {
+      mod.querySelector('input[type=checkbox]').checked = opt.getAttribute('data-on') === '1';
+    }
+    return;
+  }
+  const head = e.target.closest('.cat-head');
+  if (head) head.parentElement.classList.toggle('closed');
+});
 $('reset').onclick = () => location.reload();
 
 // --- Envoi de la lecture d'origine à AJM (endpoint AJAX FormSubmit : on lit la réponse) ---
