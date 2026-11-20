@@ -93,6 +93,8 @@
   .seg-opt { border: 0; background: transparent; border-radius: 999px; padding: 6px 13px; font: inherit; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; white-space: nowrap; transition: background .15s, color .15s; }
   .seg-opt:hover { color: var(--ink); }
   .seg-opt.on { background: var(--orange); color: #fff; }
+  .disclaimer { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--warn); border-radius: 10px; background: var(--warn-bg); color: var(--warn); font-size: 13px; margin-top: 6px; cursor: pointer; }
+  .disclaimer input { margin-top: 2px; width: 16px; height: 16px; flex: none; accent-color: var(--orange); }
 </style>
 <script>
 /* --- Internationalisation (FR / EN) --- partagée entre le rideau et l'application. */
@@ -158,6 +160,8 @@ window.AJM = (function () {
       maps_count: function (n) { return n + ' cartographie(s)'; },
       patch_count: function (n) { return n + ' octet(s) (patch programme)'; },
       need_one: 'coche au moins une modification',
+      disclaimer_text: 'Je comprends que ces modifications sont appliquées sous ma seule responsabilité, à mes risques, et qu\'AJM ne peut être tenu responsable d\'éventuels dommages.',
+      disclaimer_need: 'Coche la case de responsabilité pour continuer.',
       applied_ok: 'Fichier téléchargé',
       applied_detail: function (n) { return n + ' cartographies modifiées'; },
       report_line: function (eng, n) { return 'Moteur <b>' + eng + '</b> — <b>' + n + '</b> cartographies modifiées. Le fichier a été téléchargé.'; },
@@ -225,6 +229,8 @@ window.AJM = (function () {
       maps_count: function (n) { return n + ' map(s)'; },
       patch_count: function (n) { return n + ' byte(s) (program patch)'; },
       need_one: 'tick at least one modification',
+      disclaimer_text: 'I understand these modifications are applied under my sole responsibility, at my own risk, and that AJM cannot be held liable for any damage.',
+      disclaimer_need: 'Tick the liability box to continue.',
       applied_ok: 'File downloaded',
       applied_detail: function (n) { return n + ' maps modified'; },
       report_line: function (eng, n) { return 'Engine <b>' + eng + '</b> — <b>' + n + '</b> maps modified. The file has been downloaded.'; },
@@ -328,6 +334,10 @@ window.AJM = (function () {
     <h2><span class="step">3</span> <span data-i18n="s3">Modifications</span></h2>
     <div id="recipesInfo" class="note" style="margin-bottom:12px"></div>
     <div id="recipes"></div>
+    <label id="disclaimer" class="disclaimer hidden">
+      <input type="checkbox" id="disclaimerChk">
+      <span data-i18n="disclaimer_text">Je comprends que ces modifications sont appliquées sous ma seule responsabilité.</span>
+    </label>
     <div class="actions">
       <button id="apply" class="primary">Appliquer et télécharger</button>
       <button id="reset" class="ghost" data-i18n="reset">Recommencer</button>
@@ -385,6 +395,7 @@ function renderMode() {
   $('apply').textContent = T(mode === 'admin' ? 'apply_admin' : 'apply');
   $('historyCard').classList.toggle('hidden', mode !== 'client');  // historique : client seulement
   $('noteSend').classList.toggle('hidden', mode !== 'client');     // mention "envoi à AJM" : client seulement
+  $('disclaimer').classList.toggle('hidden', mode !== 'client');   // case responsabilite : client seulement
   renderHistory();
 }
 
@@ -672,6 +683,8 @@ $('histClear').onclick = () => { if (confirm(T('hist_confirm'))) { try { localSt
 $('apply').addEventListener('click', async () => {
   const chosen = [...document.querySelectorAll('#recipes input:checked')].map((c) => shown[+c.value]);
   if (chosen.length === 0) { $('applyMsg').innerHTML = badge(T('need_one'), 'warn'); return; }
+  // Mode client : la case de responsabilite doit etre cochee avant tout telechargement/envoi.
+  if (mode === 'client' && !$('disclaimerChk').checked) { $('applyMsg').innerHTML = badge(T('disclaimer_need'), 'warn'); return; }
   const engine = $('engineSel').value;
   const def = sw.variants[0];
   try {
