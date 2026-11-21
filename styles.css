@@ -292,3 +292,50 @@ footer p {
         padding: 20px 16px;
     }
 }
+
+/* ===== Langues FR / EN ===== */
+/* Longs blocs écrits dans les deux langues : on n'affiche que celui de la langue choisie */
+html[lang="fr"] [data-only="en"],
+html[lang="en"] [data-only="fr"] {
+    display: none;
+}
+
+/* Le menu reste à droite, juste avant le sélecteur de langue */
+header nav {
+    margin-left: auto;
+}
+
+/* Sélecteur de langue (pilule, comme sur la page MS43) */
+.lang {
+    display: flex;
+    flex-shrink: 0;
+    margin-left: 16px;
+    border: 1px solid #444;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.lang button {
+    border: 0;
+    padding: 5px 12px;
+    background: transparent;
+    color: #bbb;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.lang button.on {
+    background: linear-gradient(135deg, #007BFF, #FF7500);
+    color: #fff;
+}
+
+@media (max-width: 600px) {
+    header nav {
+        margin-left: 0;
+    }
+
+    .lang {
+        margin-left: 0;
+    }
+}

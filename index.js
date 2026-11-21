@@ -8,6 +8,11 @@ const EMAILJS_TEMPLATE_ID = "template_y1s1oe6";
 
 const SECTIONS = ["about", "services", "Réalisation", "fileservice", "CGV"];
 
+// Texte traduit (voir lang.js). Si lang.js manque, on affiche la clé.
+function T(key) {
+  return window.AJM ? window.AJM.t(key) : key;
+}
+
 // =====================================================
 //  Navigation entre les sections
 // =====================================================
@@ -59,24 +64,24 @@ function explainEmailJsError(err) {
   const text = (err && (err.text || err.message)) || String(err || "");
 
   if (/invalid grant|reconnect your gmail/i.test(text)) {
-    return "La connexion Gmail du service EmailJS a expiré (le propriétaire du site doit la reconnecter).";
+    return T("err_gmail");
   }
   if (/insufficient authentication scopes/i.test(text)) {
-    return "Le compte Gmail n'a pas autorisé EmailJS à envoyer des e-mails.";
+    return T("err_scopes");
   }
   if (/recipients address is empty/i.test(text)) {
-    return "Le modèle EmailJS n'a pas d'adresse de destination (champ « To Email »).";
+    return T("err_recipient");
   }
   if (/sdk version is unsupported/i.test(text)) {
-    return "La version d'EmailJS chargée par la page est trop ancienne (mettre à jour la balise <script> dans index.html).";
+    return T("err_sdk");
   }
   if (/limit|quota/i.test(text) || status === 426 || status === 429) {
-    return "La limite d'envoi EmailJS est atteinte. Réessayez plus tard.";
+    return T("err_limit");
   }
   if (status === 0 || /network|failed to fetch/i.test(text)) {
-    return "Problème de connexion Internet. Vérifiez votre connexion et réessayez.";
+    return T("err_network");
   }
-  return text || "Erreur inconnue.";
+  return text || T("err_unknown");
 }
 
 // =====================================================
@@ -108,13 +113,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     const price = computePrice();
     if (estimatedPriceEl) {
-      estimatedPriceEl.textContent = "Prix estimatif : " + (price > 0 ? price + "€" : "--");
+      estimatedPriceEl.textContent = T("price") + (price > 0 ? price + "€" : "--");
     }
   }
 
   requestType.addEventListener("change", updatePrice);
   if (rentBench) rentBench.addEventListener("change", updatePrice);
   updatePrice();
+  // Changement de langue : remettre à jour le prix estimatif
+  if (window.AJM) window.AJM.onChange(updatePrice);
 
   // --- EmailJS ---
   if (typeof emailjs === "undefined") {
@@ -124,14 +131,19 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
-  const submitLabel = submitBtn ? (submitBtn.textContent || submitBtn.value) : "";
-
   function setSending(isSending) {
     if (!submitBtn) return;
     submitBtn.disabled = isSending;
-    const label = isSending ? "Envoi en cours…" : submitLabel;
+    const label = isSending ? T("sending") : T("submit");
     if (submitBtn.tagName === "INPUT") submitBtn.value = label;
     else submitBtn.textContent = label;
+  }
+
+  function requestTypeFr() {
+    const opt = requestType.selectedOptions[0];
+    if (!opt) return "";
+    const key = opt.getAttribute("data-i18n");
+    return (key && window.AJM && window.AJM.tFr(key)) || opt.text.trim();
   }
 
   function val(id) {
@@ -143,7 +155,7 @@ document.addEventListener("DOMContentLoaded", function () {
     e.preventDefault();
 
     if (typeof emailjs === "undefined") {
-      alert("Erreur lors de l'envoi du formulaire : le service d'envoi n'a pas pu être chargé. Rechargez la page.");
+      alert(T("err_not_loaded"));
       return;
     }
 
@@ -157,7 +169,9 @@ document.addEventListener("DOMContentLoaded", function () {
       reply_to: val("email"),
       brand: val("brand"),
       model: val("model"),
-      requestType: requestType.selectedOptions[0] ? requestType.selectedOptions[0].text : "",
+      // Toujours en français dans l'e-mail reçu par AJM, quelle que soit la langue du visiteur
+      requestType: requestTypeFr(),
+      language: window.AJM ? window.AJM.lang.toUpperCase() : "FR",
       description: val("description"),
       gestionBrand: isGestion ? val("gestionBrand") : "",
       rentBench: isGestion && rentBench && rentBench.checked ? "Oui" : "Non",
@@ -176,7 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .catch(function (err) {
         console.error("Erreur EmailJS :", err);
-        alert("Erreur lors de l'envoi du formulaire :\n" + explainEmailJsError(err));
+        alert(T("err_title") + "\n" + explainEmailJsError(err));
       })
       .finally(function () {
         setSending(false);
