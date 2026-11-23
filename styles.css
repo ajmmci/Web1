@@ -1,0 +1,341 @@
+/* Reset / Base */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    background: #f4f4f4;
+    /* Le site occupe toujours toute la hauteur de l'écran */
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Header */
+header {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #FF7500;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+header .logo img {
+    height: 50px;
+    margin-right: 10px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    margin: 0 10px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s;
+    font-size: 14px;
+}
+
+nav ul li a:hover {
+    color: #FFA500;
+}
+
+/* Hero Section */
+#hero {
+    background: linear-gradient(to right, #FFA500, #0000FF);
+    color: #fff;
+    text-align: center;
+    padding: 50px 20px;
+    /* L'accueil remplit l'espace entre le menu et le pied de page */
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#hero h1 {
+    margin: 0;
+    font-size: clamp(1.8rem, 6vw, 3.5rem);
+}
+
+/* Sections */
+section {
+    padding: 20px;
+    text-align: center;
+}
+
+/* Section Services */
+#services {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+#services h2 {
+    color: #000; /* titre en noir */
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+#services ul {
+    list-style: disc; /* remet les puces */
+    padding-left: 40px; /* espace pour que les puces ne collent pas au bord */
+    margin: 0 auto;
+    max-width: 600px; /* largeur max pour aligner avec le titre */
+}
+
+#services li {
+    font-size: 1.1rem;
+    margin: 8px 0;
+    text-align: left; /* texte aligné à gauche pour chaque puce */
+}
+
+/* Pop-up background */
+.popup {
+    display: none; /* caché par défaut */
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Pop-up content */
+.popup-content {
+    background-color: #1a1a1a;
+    color: #fff;
+    border-radius: 15px;
+    padding: 25px 30px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    position: relative;
+}
+
+/* Close button */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 26px;
+    color: #FF7500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.close-btn:hover {
+    color: #007BFF;
+}
+
+/* Form elements */
+.form-group {
+    margin-top: 10px;
+    text-align: left;
+}
+
+form label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+form input, form select, form textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 0.95em;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+form textarea {
+    resize: none;
+}
+
+form button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    font-size: 1em;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #007BFF, #FF7500);
+    color: #fff;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+form button:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+}
+
+/* Checkbox banc */
+.checkbox-group .note {
+    display: block;
+    font-size: 0.8em;
+    color: #ccc;
+    margin-left: 25px;
+}
+
+/* Prix estimatif */
+.price-display {
+    font-weight: bold;
+    text-align: center;
+    margin-top: 15px;
+    color: #FFA500;
+}
+
+/* Info note */
+.info-note {
+    margin-top: 13px;
+    font-size: 0.9em;
+    color: gray;
+    text-align: center;
+}
+
+/* Footer */
+footer {
+    background: #1a1a1a;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    /* Toujours collé en bas de l'écran */
+    margin-top: auto;
+}
+
+footer p {
+    margin-bottom: 1px;
+}
+
+/* Bouton outil MS43 en ligne */
+.ms43-cta {
+    display: inline-block;
+    padding: 12px 20px;
+    margin-top: 18px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #007BFF, #FF7500);
+    color: #fff !important;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.ms43-cta:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+}
+
+/* Textes longs (CGV) : largeur de lecture confortable sur grand écran */
+#CGV {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* ===== Smartphone ===== */
+@media (max-width: 600px) {
+    header {
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px;
+    }
+
+    nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px 16px;
+    }
+
+    nav ul li {
+        margin: 0;
+    }
+
+    nav ul li a {
+        font-size: 15px;
+        display: inline-block;
+        padding: 6px 0;
+    }
+
+    section,
+    #services {
+        padding: 24px 16px;
+    }
+
+    #services ul {
+        padding-left: 20px;
+    }
+
+    .popup-content {
+        padding: 20px 16px;
+    }
+}
+
+/* ===== Langues FR / EN ===== */
+/* Longs blocs écrits dans les deux langues : on n'affiche que celui de la langue choisie */
+html[lang="fr"] [data-only="en"],
+html[lang="en"] [data-only="fr"] {
+    display: none;
+}
+
+/* Le menu reste à droite, juste avant le sélecteur de langue */
+header nav {
+    margin-left: auto;
+}
+
+/* Sélecteur de langue (pilule, comme sur la page MS43) */
+.lang {
+    display: flex;
+    flex-shrink: 0;
+    margin-left: 16px;
+    border: 1px solid #444;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.lang button {
+    border: 0;
+    padding: 5px 12px;
+    background: transparent;
+    color: #bbb;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.lang button.on {
+    background: linear-gradient(135deg, #007BFF, #FF7500);
+    color: #fff;
+}
+
+@media (max-width: 600px) {
+    header nav {
+        margin-left: 0;
+    }
+
+    .lang {
+        margin-left: 0;
+    }
+}

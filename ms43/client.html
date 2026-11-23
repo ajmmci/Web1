@@ -1,0 +1,1045 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Service MS43</title>
+<style>  :root {
+    --bg: #f4f4f4; --card: #ffffff; --ink: #1a1a1a; --muted: #5f6672; --line: #e3e3e3;
+    --accent: #007BFF; --accent-ink: #ffffff; --ok: #1a7d33; --warn: #9a5b08; --err: #c22323;
+    --ok-bg: #e7f4ec; --warn-bg: #fbeede; --err-bg: #fbe6e6; --shadow: 0 2px 10px rgba(20,30,50,.07);
+    --orange: #FF7500; --seg-bg: #eef1f5;
+    --brand-grad: linear-gradient(135deg, #007BFF, #FF7500);
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); }
+  body { margin: 0; color: var(--ink); font: 15px/1.6 Arial, "Helvetica Neue", Helvetica, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 28px 16px 72px; }
+  header { margin-bottom: 18px; }
+  .hero { background: var(--brand-grad); border-radius: 16px; padding: 26px 22px; text-align: center; box-shadow: var(--shadow); }
+  header h1 { color: #fff; font-size: 24px; margin: 0 0 6px; letter-spacing: -.01em; }
+  header p { color: #fff; opacity: .92; margin: 0 auto; max-width: 560px; font-size: 13.5px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .card h2 { font-size: 15px; margin: 0 0 14px; display: flex; align-items: center; gap: 8px; }
+  .step { display: inline-flex; width: 22px; height: 22px; border-radius: 50%; background: var(--brand-grad); color: #fff; font-size: 12px; font-weight: 700; align-items: center; justify-content: center; }
+  .drop { border: 2px dashed var(--line); border-radius: 12px; padding: 34px 16px; text-align: center; color: var(--muted); cursor: pointer; transition: border-color .15s, background .15s; }
+  .drop:hover, .drop.over { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); color: var(--ink); }
+  .drop b { color: var(--ink); }
+  .fname { margin-top: 8px; font-size: 13px; color: var(--muted); word-break: break-all; }
+  .grid { display: grid; grid-template-columns: 160px 1fr; gap: 10px 14px; align-items: center; }
+  .grid .k { color: var(--muted); font-size: 13px; }
+  .grid .v { font-weight: 600; }
+  @media (max-width: 440px) { .grid { grid-template-columns: 1fr; gap: 4px 0; } .grid .v { margin-bottom: 8px; } }
+  .tag { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; vertical-align: middle; }
+  .tag.ok { background: var(--ok-bg); color: var(--ok); }
+  .tag.warn { background: var(--warn-bg); color: var(--warn); }
+  .tag.err { background: var(--err-bg); color: var(--err); }
+  select, button { font: inherit; border-radius: 9px; border: 1px solid var(--line); padding: 9px 13px; background: var(--card); color: var(--ink); }
+  select { max-width: 220px; }
+  button { cursor: pointer; }
+  button.primary { background: var(--brand-grad); color: #fff; border-color: transparent; font-weight: 700; }
+  button.primary:hover { opacity: .92; transform: scale(1.01); }
+  button.ghost { background: transparent; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .banner { border-radius: 10px; padding: 11px 14px; font-size: 13.5px; margin-top: 4px; }
+  .banner.err { background: var(--err-bg); color: var(--err); }
+  .banner.warn { background: var(--warn-bg); color: var(--warn); }
+  .banner.ok { background: var(--ok-bg); color: var(--ok); }
+  .banner > div + div { margin-top: 6px; }
+  .banner code { font-size: 12px; }
+  label.rec { display: flex; gap: 11px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--line); cursor: pointer; }
+  label.rec:first-of-type { border-top: 0; }
+  label.rec input { margin-top: 3px; width: 16px; height: 16px; flex: none; }
+  label.rec .t { font-weight: 600; }
+  label.rec .d { color: var(--muted); font-size: 13px; }
+  label.rec .m { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 16px; }
+  .sel-tools { display: flex; gap: 14px; font-size: 13px; margin-bottom: 6px; }
+  .sel-tools a { color: var(--accent); cursor: pointer; }
+  .change { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 6px 0; border-top: 1px solid var(--line); }
+  .change span:first-child { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; white-space: nowrap; }
+  .change span:last-child { text-align: right; }
+  .note { font-size: 12.5px; color: var(--muted); }
+  .note ul { margin: 8px 0 0; padding-left: 18px; }
+  .note li { margin: 3px 0; }
+  .hist-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .hist-head h2 { margin: 0; }
+  .hidden { display: none !important; }
+  .lang { position: fixed; top: 12px; right: 12px; z-index: 10001; display: flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--card); box-shadow: var(--shadow); }
+  .lang button { border: 0; border-radius: 0; padding: 6px 13px; background: transparent; font-size: 13px; font-weight: 700; color: var(--muted); }
+  .lang button.on { background: var(--brand-grad); color: #fff; }
+  #authGate { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 16px; }
+  #authGate .box { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 26px 24px; width: 100%; max-width: 340px; box-shadow: var(--shadow); text-align: center; }
+  #authGate h1 { font-size: 18px; margin: 0 0 6px; }
+  #authGate p { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
+  #authGate input { width: 100%; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; margin-bottom: 10px; text-align: center; }
+  #authGate button { width: 100%; }
+  #authGate .err { color: var(--err); font-size: 13px; min-height: 18px; margin-top: 8px; }
+  .cat { border: 1px solid var(--line); border-radius: 12px; margin-bottom: 12px; background: var(--card); overflow: hidden; }
+  .cat-head { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 13px 16px; background: transparent; border: 0; border-radius: 0; font: inherit; font-weight: 700; font-size: 14px; color: var(--ink); cursor: pointer; }
+  .cat-head .chev { color: var(--orange); font-size: 12px; transition: transform .2s; }
+  .cat.closed .cat-head .chev { transform: rotate(-90deg); }
+  .cat.closed .cat-body { display: none; }
+  .cat-body { padding: 2px 16px 12px; }
+  .mod { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--line); }
+  .cat-body .mod:first-child { border-top: 0; }
+  .mod-head { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 190px; }
+  .mod-name { font-weight: 600; font-size: 14px; }
+  .mod-desc { color: var(--muted); font-size: 12.5px; }
+  .mod-meta { color: var(--muted); font-size: 11.5px; }
+  .seg { display: inline-flex; background: var(--seg-bg); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; flex: none; }
+  .seg-group { flex-wrap: wrap; }
+  .seg-opt { border: 0; background: transparent; border-radius: 999px; padding: 6px 13px; font: inherit; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; white-space: nowrap; transition: background .15s, color .15s; }
+  .seg-opt:hover { color: var(--ink); }
+  .seg-opt.on { background: var(--orange); color: #fff; }
+  .disclaimer { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--warn); border-radius: 10px; background: var(--warn-bg); color: var(--warn); font-size: 13px; margin-top: 6px; cursor: pointer; }
+  .disclaimer input { margin-top: 2px; width: 16px; height: 16px; flex: none; accent-color: var(--orange); }
+  .pop-warn { cursor: default; margin: 6px 0 10px; }
+  .field { margin-top: 12px; }
+  .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+  .field input { width: 100%; max-width: 340px; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; }
+</style>
+<script>
+window.MS43_API = 'https://ms43-api.ajmmci.workers.dev';
+window.AJM = (function () {
+  var I18N = {
+    fr: {
+      gate_h1: 'Accès MS43',
+      gate_p: 'Entre ton mot de passe pour continuer.',
+      gate_ph: 'Mot de passe',
+      gate_btn: 'Entrer',
+      gate_bad: 'Mot de passe incorrect.',
+      gate_net: 'Serveur injoignable. Réessaie dans un instant.',
+      session_expired: 'Session expirée : recharge la page pour te reconnecter.',
+      analyzing: 'Analyse en cours…',
+      applying: 'Préparation du fichier…',
+      header_admin: 'Détection automatique de la version logiciel et application des modifications validées. Le fichier est traité sur le serveur AJM et n\'y est pas conservé.',
+      header_client: 'Importe ta lecture d\'origine, choisis tes modifications et télécharge le fichier. Ta lecture d\'origine est transmise à AJM pour le suivi de ta demande.',
+      s1: 'Importer le fichier',
+      drop: 'Dépose un fichier <b>.bin</b> (512&nbsp;Ko), ou clique pour le choisir',
+      s2: 'Détection',
+      k_size: 'Taille',
+      k_sw: 'Version logiciel',
+      k_engine: 'Base moteur',
+      s3: 'Modifications',
+      seg_off: 'Off', seg_on: 'On',
+      group_limiter: 'Régime max',
+      cat_rpm: 'Régime & limiteur', cat_fuel: 'Carburant & moteur', cat_misc: 'Confort & divers', cat_depol: 'Dépollution (hors route)', cat_other: 'Divers',
+      cat_pop: 'Pop & Bang (hors route)',
+      pop_enable: 'Activer le Pop & Bang', pop_enable_d: 'Pétarades à l\'échappement en levant le pied.',
+      pop_warn: '⚠ Le Pop & Bang maintient du carburant imbrûlé et retarde l\'allumage à l\'échappement. À utiliser <b>impérativement sans catalyseur</b> : les pétarades l\'endommagent très rapidement. Il sollicite aussi les soupapes et les sondes, augmente la température d\'échappement et n\'est <b>pas homologué route</b>. Réservé à un usage hors route / compétition, à tes risques.',
+      pop_agg: 'Calage de l\'avance à l\'allumage', pop_rpm: 'Pops jusqu\'à', pop_dur: 'Durée', pop_trig: 'Déclenchement',
+      pop_agg_d: 'Ce réglage joue sur l\'avance à l\'allumage : ici on <b>retarde</b> l\'étincelle (elle se produit après le PMH), ce qui décale la combustion vers l\'échappement. Plus le retard est important, plus les pétarades sont fortes.',
+      pop_ac_all: 'Tout le temps', pop_ac_clim: 'Sur clim', pop_inf: '∞',
+      pop_unit_rpm: ' tr', pop_unit_s: ' s',
+      sel_all: 'Tout cocher',
+      sel_none: 'Tout décocher',
+      apply: 'Envoyer la demande et télécharger',
+      apply_admin: 'Appliquer et télécharger',
+      reset: 'Recommencer',
+      report: 'Confirmation',
+      report_detail: 'Rapport',
+      redownload: 'Télécharger à nouveau',
+      sent: 'Demande transmise à AJM',
+      sending: 'Envoi en cours…',
+      send_fail: 'Envoi à AJM en échec — réessaie',
+      done_msg: 'Ton fichier a été préparé et téléchargé. Ta demande a été transmise à AJM — garde bien ta lecture d\'origine de côté.',
+      hist_title: 'Mes demandes',
+      hist_clear: 'Vider',
+      hist_empty: 'Aucune demande pour le moment. Ton historique s\'affiche ici (sur ce navigateur).',
+      hist_note: 'Historique enregistré sur ce navigateur uniquement.',
+      hist_confirm: 'Vider tout l\'historique de ce navigateur ?',
+      note_title: 'À savoir avant de flasher',
+      note_send: 'Ta lecture d\'origine est envoyée à AJM au moment de la demande, pour préparer ta cartographie.',
+      note_1: 'Les sommes de contrôle ne sont pas recalculées ici&nbsp;: utilise un flasher qui les corrige à l\'écriture.',
+      note_2: 'Les valeurs des modifications proviennent de fichiers de référence&nbsp;; elles doivent être validées sur banc ou sur un calculateur de test avant tout usage.',
+      note_3: 'L\'antidémarrage (EWS) n\'est pas proposé. Les fonctions de dépollution sont réservées à un usage hors route / compétition.',
+      note_4: 'L\'original n\'est jamais modifié&nbsp;: le fichier téléchargé est une copie.',
+      bytes: function (s) { return s + ' octets'; },
+      bad_size_badge: 'taille invalide',
+      bad_size: function (s) { return 'Ce fichier fait ' + s + ' octets. Une lecture MS43 complète fait 524&nbsp;288 octets (512&nbsp;Ko).'; },
+      unknown_badge: 'inconnue',
+      unknown: function (raw) { return 'Version logiciel non reconnue (octets lus&nbsp;: <code>' + raw + '</code>). Aucune modification n\'est appliquée.'; },
+      inconsistent_badge: 'incohérent',
+      inconsistent: function (p, c) { return 'Le programme (' + p + ') et la calibration (' + c + ') ne correspondent pas. Fichier refusé.'; },
+      engine_from_name: 'd\'après le nom',
+      engine_ambiguous_badge: function (f) { return 'ambigu : ' + f; },
+      engine_ambiguous: 'Plusieurs bases moteur dans le nom du fichier. Choisis la bonne ci-dessus.',
+      engine_confirm_badge: 'à confirmer',
+      engine_confirm: 'La base moteur n\'est pas lisible dans le nom du fichier. Sélectionne-la ci-dessus.',
+      engine_choose_opt: '— choisir —',
+      info_choose_engine: 'Choisis la base moteur pour voir les modifications disponibles.',
+      info_none: function (eng, def) { return 'Aucune modification disponible pour le moteur ' + eng + ' sur le SW ' + def + ' pour le moment.'; },
+      info_ready: function (def, eng) { return 'SW ' + def + ', moteur ' + eng + ' — choisis tes modifications.'; },
+      maps_count: function (n) { return n + ' cartographie(s)'; },
+      patch_count: function (n) { return n + ' octet(s) (patch programme)'; },
+      need_one: 'coche au moins une modification',
+      disclaimer_text: 'Je comprends que ces modifications sont appliquées sous ma seule responsabilité, à mes risques, et qu\'AJM ne peut être tenu responsable d\'éventuels dommages.',
+      disclaimer_need: 'Coche la case de responsabilité pour continuer.',
+      email_label: 'Ton adresse e-mail (pour te contacter en cas de souci)',
+      email_ph: 'ton@email.com',
+      email_need: 'Entre une adresse e-mail valide pour continuer.',
+      orig_note: '⚠ Les modifications ne fonctionnent que sur une <b>lecture d\'origine</b> (fichier d\'usine non modifié). N\'importe pas un fichier déjà retouché.',
+      k_origin: 'Origine',
+      orig_checking: 'vérification…',
+      orig_stock_badge: 'lecture d\'origine',
+      orig_stock: function (l) { return 'Identique à la lecture d\'usine <b>' + l + '</b> (programme et calibration).'; },
+      orig_modified_badge: 'fichier modifié',
+      orig_modified: 'Le programme du calculateur a été patché&nbsp;: ce n\'est pas une lecture d\'origine.',
+      orig_modified_client: 'Ce fichier a déjà été modifié. Les modifications sont prévues pour une lecture d\'origine&nbsp;: le résultat n\'est pas garanti. Importe de préférence la lecture d\'origine de ton calculateur.',
+      orig_patches: function (l) { return 'Patch(s) reconnu(s)&nbsp;: ' + l + '.'; },
+      orig_cal_same: function (l) { return 'Calibration identique à l\'usine (' + l + ').'; },
+      orig_cal_badge: 'non confirmée',
+      orig_cal_admin: 'Calibration absente de la base d\'usine&nbsp;: fichier retouché ou variante non répertoriée.',
+      orig_cal_client: 'Calibration non reconnue&nbsp;: soit le fichier a été retouché, soit c\'est une variante d\'usine absente de notre base. AJM vérifiera ta lecture.',
+      orig_nearest: function (l, n) { return 'Lecture d\'usine la plus proche&nbsp;: <b>' + l + '</b> — ' + n + ' octet(s) différent(s).'; },
+      orig_maps: function (n, l) { return n + ' cartographie(s) différente(s)&nbsp;: ' + l; },
+      orig_outside: function (n) { return n + ' octet(s) hors cartographie (sommes de contrôle, identifiants…).'; },
+      orig_confirm_modified: 'Ce fichier n\'est pas une lecture d\'origine : il a déjà été modifié.\n\nLes modifications sont prévues pour une lecture d\'origine, le résultat n\'est pas garanti.\n\nVeux-tu quand même continuer ?',
+      orig_confirm_cal: 'La calibration de ce fichier ne correspond à aucune lecture d\'origine connue : il a peut-être déjà été modifié.\n\nVeux-tu quand même continuer ?',
+      orig_cancelled: 'demande annulée',
+      est_title: function (s) { return 'Estimation (tables d\'avance, d\'injection et injecteurs comparées aux lectures d\'usine ' + s + ')&nbsp;:'; },
+      orig_partial: 'Lecture partielle&nbsp;: le programme n\'a pas été lu, seule la calibration est comparée.',
+      orig_prog_unknown: function (s) { return 'Programme non répertorié pour le SW ' + s + ' (autre variante d\'usine possible)&nbsp;: non vérifié.'; },
+      est_likely_stock_badge: 'semble d\'origine',
+      est_likely_modified_badge: 'semble modifié',
+      est_unclear_badge: 'non vérifiable',
+      est_likely_stock: function (s, c) { return 'Il semblerait que le fichier soit <b>d\'origine</b> (' + s + ' tables sur ' + c + ' identiques à l\'usine).'; },
+      est_likely_modified: function (s, c) { return 'Il semblerait que le fichier ait été <b>modifié</b>&nbsp;: des tables de prépa sont toutes décalées dans le même sens (' + s + ' tables sur ' + c + ' identiques à l\'usine).'; },
+      est_unclear: function (s, c) { return 'Impossible de conclure&nbsp;: les tables sont trop différentes du 430069 (' + s + ' sur ' + c + ' identiques), ce qui peut venir d\'une autre calibration d\'usine.'; },
+      est_nearest: function (l) { return 'Lecture d\'usine la plus ressemblante&nbsp;: <b>' + l + '</b>.'; },
+      est_diff: function (t, n, tot, m, u) { return '<code>' + t + '</code> ' + n + '/' + tot + ' cases, ' + m + ' ' + u + ' en moyenne'; },
+      est_tune: function (l) { return 'Tables de prépa décalées&nbsp;: ' + l + '.'; },
+      est_warn: 'C\'est une estimation&nbsp;: une autre version SW d\'usine peut avoir des tables légèrement différentes.',
+      orig_confirm_est: 'Il semblerait que ce fichier ait déjà été modifié (tables d\'injection / d\'avance différentes de l\'usine).\n\nLes modifications sont prévues pour une lecture d\'origine, le résultat n\'est pas garanti.\n\nVeux-tu quand même continuer ?',
+      orig_noref_badge: 'non vérifiable',
+      orig_noref: function (s) { return 'Pas encore de lecture d\'usine de référence pour le SW ' + s + '&nbsp;: l\'origine ne peut pas être vérifiée avec certitude.'; },
+      applied_ok: 'Fichier téléchargé',
+      applied_detail: function (n) { return n + ' cartographies modifiées'; },
+      report_line: function (eng, n) { return 'Moteur <b>' + eng + '</b> — <b>' + n + '</b> cartographies modifiées. Le fichier a été téléchargé.'; },
+      rounded: function (n) { return n + ' valeur(s) ajustée(s) au pas le plus proche de la cartographie.'; },
+      more: function (n) { return '… et ' + n + ' autres.'; },
+      locale: 'fr-FR'
+    },
+    en: {
+      gate_h1: 'MS43 access',
+      gate_p: 'Enter your password to continue.',
+      gate_ph: 'Password',
+      gate_btn: 'Enter',
+      gate_bad: 'Incorrect password.',
+      gate_net: 'Server unreachable. Please try again in a moment.',
+      session_expired: 'Session expired: reload the page to sign in again.',
+      analyzing: 'Analysing…',
+      applying: 'Preparing the file…',
+      header_admin: 'Automatic software version detection and application of validated modifications. The file is processed on the AJM server and is not kept there.',
+      header_client: 'Import your original read, pick your modifications and download the file. Your original read is sent to AJM to process your request.',
+      s1: 'Import the file',
+      drop: 'Drop a <b>.bin</b> file (512&nbsp;KB), or click to choose it',
+      s2: 'Detection',
+      k_size: 'Size',
+      k_sw: 'Software version',
+      k_engine: 'Engine',
+      s3: 'Modifications',
+      seg_off: 'Off', seg_on: 'On',
+      group_limiter: 'Rev limit',
+      cat_rpm: 'Rev limit & cut', cat_fuel: 'Fuel & engine', cat_misc: 'Comfort & misc', cat_depol: 'Emissions (off-road)', cat_other: 'Other',
+      cat_pop: 'Pop & Bang (off-road)',
+      pop_enable: 'Enable Pop & Bang', pop_enable_d: 'Exhaust crackle when you lift off.',
+      pop_warn: '⚠ Pop & Bang keeps unburnt fuel and retards ignition into the exhaust. Use it <b>only without a catalytic converter</b>: the crackle damages it very quickly. It also stresses the valves and sensors, raises exhaust temperature and is <b>not road-legal</b>. Off-road / motorsport use only, at your own risk.',
+      pop_agg: 'Ignition timing', pop_rpm: 'Pops up to', pop_dur: 'Duration', pop_trig: 'Trigger',
+      pop_agg_d: 'This setting acts on ignition timing: here the spark is <b>retarded</b> (it fires after TDC), moving combustion towards the exhaust. The more retard, the stronger the crackle.',
+      pop_ac_all: 'Always', pop_ac_clim: 'A/C on', pop_inf: '∞',
+      pop_unit_rpm: ' rpm', pop_unit_s: ' s',
+      sel_all: 'Select all',
+      sel_none: 'Clear all',
+      apply: 'Send request and download',
+      apply_admin: 'Apply and download',
+      reset: 'Start over',
+      report: 'Confirmation',
+      report_detail: 'Report',
+      redownload: 'Download again',
+      sent: 'Request sent to AJM',
+      sending: 'Sending…',
+      send_fail: 'Send to AJM failed — try again',
+      done_msg: 'Your file has been prepared and downloaded. Your request has been sent to AJM — keep your original read safe.',
+      hist_title: 'My requests',
+      hist_clear: 'Clear',
+      hist_empty: 'No requests yet. Your history appears here (on this browser).',
+      hist_note: 'History saved on this browser only.',
+      hist_confirm: 'Clear all history on this browser?',
+      note_title: 'Before flashing',
+      note_send: 'Your original read is sent to AJM when you submit the request, to prepare your tune.',
+      note_1: 'Checksums are not recalculated here&nbsp;: use a flasher that corrects them on write.',
+      note_2: 'Modification values come from reference files&nbsp;; they must be validated on a bench or a test ECU before any use.',
+      note_3: 'The immobiliser (EWS) is not offered. Emissions functions are for off-road / motorsport use only.',
+      note_4: 'The original is never modified&nbsp;: the downloaded file is a copy.',
+      bytes: function (s) { return s + ' bytes'; },
+      bad_size_badge: 'invalid size',
+      bad_size: function (s) { return 'This file is ' + s + ' bytes. A full MS43 read is 524,288 bytes (512&nbsp;KB).'; },
+      unknown_badge: 'unknown',
+      unknown: function (raw) { return 'Software version not recognised (bytes read&nbsp;: <code>' + raw + '</code>). No modification applied.'; },
+      inconsistent_badge: 'inconsistent',
+      inconsistent: function (p, c) { return 'The program (' + p + ') and the calibration (' + c + ') do not match. File rejected.'; },
+      engine_from_name: 'from the filename',
+      engine_ambiguous_badge: function (f) { return 'ambiguous: ' + f; },
+      engine_ambiguous: 'Several engine bases in the filename. Pick the right one above.',
+      engine_confirm_badge: 'to confirm',
+      engine_confirm: 'The engine base is not readable in the filename. Select it above.',
+      engine_choose_opt: '— choose —',
+      info_choose_engine: 'Choose the engine base to see the available modifications.',
+      info_none: function (eng, def) { return 'No modification available for the ' + eng + ' engine on SW ' + def + ' yet.'; },
+      info_ready: function (def, eng) { return 'SW ' + def + ', ' + eng + ' engine — pick your modifications.'; },
+      maps_count: function (n) { return n + ' map(s)'; },
+      patch_count: function (n) { return n + ' byte(s) (program patch)'; },
+      need_one: 'tick at least one modification',
+      disclaimer_text: 'I understand these modifications are applied under my sole responsibility, at my own risk, and that AJM cannot be held liable for any damage.',
+      disclaimer_need: 'Tick the liability box to continue.',
+      email_label: 'Your email address (so we can reach you if there\'s an issue)',
+      email_ph: 'you@email.com',
+      email_need: 'Enter a valid email address to continue.',
+      orig_note: '⚠ Modifications only work on a <b>stock original read</b> (unmodified factory file). Don\'t import a file that has already been tuned.',
+      k_origin: 'Origin',
+      orig_checking: 'checking…',
+      orig_stock_badge: 'stock read',
+      orig_stock: function (l) { return 'Identical to the factory read <b>' + l + '</b> (program and calibration).'; },
+      orig_modified_badge: 'modified file',
+      orig_modified: 'The ECU program has been patched&nbsp;: this is not a stock read.',
+      orig_modified_client: 'This file has already been modified. Modifications are designed for a stock read&nbsp;: the result is not guaranteed. Preferably import your ECU\'s original read.',
+      orig_patches: function (l) { return 'Recognised patch(es)&nbsp;: ' + l + '.'; },
+      orig_cal_same: function (l) { return 'Calibration identical to factory (' + l + ').'; },
+      orig_cal_badge: 'not confirmed',
+      orig_cal_admin: 'Calibration not in the factory database&nbsp;: tuned file or unlisted variant.',
+      orig_cal_client: 'Calibration not recognised&nbsp;: either the file has been tuned, or it is a factory variant missing from our database. AJM will check your read.',
+      orig_nearest: function (l, n) { return 'Closest factory read&nbsp;: <b>' + l + '</b> — ' + n + ' byte(s) differ.'; },
+      orig_maps: function (n, l) { return n + ' map(s) differ&nbsp;: ' + l; },
+      orig_outside: function (n) { return n + ' byte(s) outside any map (checksums, identifiers…).'; },
+      orig_confirm_modified: 'This file is not a stock read: it has already been modified.\n\nModifications are designed for a stock read, the result is not guaranteed.\n\nDo you still want to continue?',
+      orig_confirm_cal: 'This file\'s calibration does not match any known stock read: it may already have been modified.\n\nDo you still want to continue?',
+      orig_cancelled: 'request cancelled',
+      est_title: function (s) { return 'Estimate (ignition, injection and injector tables compared with ' + s + ' factory reads)&nbsp;:'; },
+      orig_partial: 'Partial read&nbsp;: the program was not read, only the calibration is compared.',
+      orig_prog_unknown: function (s) { return 'Program not listed for SW ' + s + ' (possibly another factory variant)&nbsp;: not checked.'; },
+      est_likely_stock_badge: 'looks stock',
+      est_likely_modified_badge: 'looks modified',
+      est_unclear_badge: 'cannot check',
+      est_likely_stock: function (s, c) { return 'The file seems to be <b>stock</b> (' + s + ' of ' + c + ' tables identical to factory).'; },
+      est_likely_modified: function (s, c) { return 'The file seems to have been <b>modified</b>&nbsp;: tuning tables are all shifted in the same direction (' + s + ' of ' + c + ' tables identical to factory).'; },
+      est_unclear: function (s, c) { return 'Cannot conclude&nbsp;: the tables differ too much from 430069 (' + s + ' of ' + c + ' identical), which may come from another factory calibration.'; },
+      est_nearest: function (l) { return 'Most similar factory read&nbsp;: <b>' + l + '</b>.'; },
+      est_diff: function (t, n, tot, m, u) { return '<code>' + t + '</code> ' + n + '/' + tot + ' cells, ' + m + ' ' + u + ' on average'; },
+      est_tune: function (l) { return 'Shifted tuning tables&nbsp;: ' + l + '.'; },
+      est_warn: 'This is an estimate&nbsp;: another factory SW version may have slightly different tables.',
+      orig_confirm_est: 'This file seems to have already been modified (injection / ignition tables differ from factory).\n\nModifications are designed for a stock read, the result is not guaranteed.\n\nDo you still want to continue?',
+      orig_noref_badge: 'cannot check',
+      orig_noref: function (s) { return 'No factory reference read for SW ' + s + ' yet&nbsp;: the origin cannot be checked with certainty.'; },
+      applied_ok: 'File downloaded',
+      applied_detail: function (n) { return n + ' maps modified'; },
+      report_line: function (eng, n) { return 'Engine <b>' + eng + '</b> — <b>' + n + '</b> maps modified. The file has been downloaded.'; },
+      rounded: function (n) { return n + ' value(s) adjusted to the map\'s nearest step.'; },
+      more: function (n) { return '… and ' + n + ' more.'; },
+      locale: 'en-GB'
+    }
+  };
+  var lang = 'fr';
+  var listeners = [];
+  function t(key) {
+    var v = I18N[lang][key];
+    if (typeof v === 'function') { return v.apply(null, Array.prototype.slice.call(arguments, 1)); }
+    return v;
+  }
+  function applyStatic() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach(function (el) { el.innerHTML = t(el.getAttribute('data-i18n')); });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function (el) { el.placeholder = t(el.getAttribute('data-i18n-ph')); });
+    document.querySelectorAll('.lang button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-lang') === lang); });
+    listeners.forEach(function (fn) { try { fn(); } catch (e) {} });
+  }
+  function setLang(l) { if (I18N[l]) { lang = l; applyStatic(); } }
+  function onChange(fn) { listeners.push(fn); }
+  return { t: t, setLang: setLang, applyStatic: applyStatic, onChange: onChange, get lang() { return lang; } };
+})();
+</script>
+</head>
+<body>
+<div class="lang">
+  <button type="button" data-lang="fr" onclick="AJM.setLang('fr')">FR</button>
+  <button type="button" data-lang="en" onclick="AJM.setLang('en')">EN</button>
+</div>
+<div id="authGate">
+  <form class="box" id="authForm">
+    <h1 data-i18n="gate_h1">Accès MS43</h1>
+    <p data-i18n="gate_p">Entre ton mot de passe pour continuer.</p>
+    <input id="authPass" type="password" autocomplete="current-password" data-i18n-ph="gate_ph" placeholder="Mot de passe" autofocus>
+    <button class="primary" type="submit" data-i18n="gate_btn">Entrer</button>
+    <div class="err" id="authErr"></div>
+  </form>
+</div>
+<script>
+(function () {
+  var gate = document.getElementById('authGate');
+  function unlock() { gate.remove(); }
+  function setMode(m) { window.__ms43mode = m; if (window.__applyMode) window.__applyMode(m); }
+  document.getElementById('authForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var err = document.getElementById('authErr');
+    err.textContent = '';
+    try {
+      var r = await fetch(window.MS43_API + '/api/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: document.getElementById('authPass').value }),
+      });
+      if (r.status === 403) { err.textContent = window.AJM.t('gate_bad'); return; }
+      var data = await r.json();
+      if (!r.ok) { err.textContent = data.error || window.AJM.t('gate_net'); return; }
+      window.__ms43token = data.token;
+      setMode(data.mode);
+      unlock();
+    } catch (ex) { err.textContent = window.AJM.t('gate_net'); }
+  });
+})();
+</script>
+<iframe id="fsSink" name="fs_sink" class="hidden"></iframe>
+<main>
+  <header class="hero">
+    <h1>Service MS43</h1>
+    <p id="headerP">Détection automatique de la version logiciel et application des modifications.</p>
+  </header>
+
+  <section class="card">
+    <h2><span class="step">1</span> <span data-i18n="s1">Importer le fichier</span></h2>
+    <div id="drop" class="drop">
+      <div data-i18n="drop">Dépose un fichier <b>.bin</b> (512&nbsp;Ko), ou clique pour le choisir</div>
+      <div id="fname" class="fname"></div>
+    </div>
+    <input id="file" type="file" accept=".bin,application/octet-stream" class="hidden">
+    <div id="origNote" class="banner warn hidden" style="margin-top:12px" data-i18n="orig_note">Les modifications ne fonctionnent que sur une lecture d'origine.</div>
+  </section>
+
+  <section id="detectCard" class="card hidden">
+    <h2><span class="step">2</span> <span data-i18n="s2">Détection</span></h2>
+    <div class="grid">
+      <div class="k" data-i18n="k_size">Taille</div><div class="v" id="vSize"></div>
+      <div class="k" data-i18n="k_sw">Version logiciel</div><div class="v" id="vSw"></div>
+      <div class="k" data-i18n="k_engine">Base moteur</div>
+      <div class="v">
+        <span id="vEngine"></span>
+        <select id="engineSel" class="hidden"></select>
+      </div>
+      <div class="k" data-i18n="k_origin">Origine</div><div class="v" id="vOrig"></div>
+    </div>
+    <div id="origBanner" style="margin-top:12px"></div>
+    <div id="detectBanner"></div>
+  </section>
+
+  <section id="recipesCard" class="card hidden">
+    <h2><span class="step">3</span> <span data-i18n="s3">Modifications</span></h2>
+    <div id="recipesInfo" class="note" style="margin-bottom:12px"></div>
+    <div id="recipes"></div>
+    <div id="emailField" class="field hidden">
+      <label for="clientEmail" data-i18n="email_label">Ton adresse e-mail (pour te contacter en cas de souci)</label>
+      <input id="clientEmail" type="email" autocomplete="email" data-i18n-ph="email_ph" placeholder="ton@email.com">
+    </div>
+    <label id="disclaimer" class="disclaimer hidden">
+      <input type="checkbox" id="disclaimerChk">
+      <span data-i18n="disclaimer_text">Je comprends que ces modifications sont appliquées sous ma seule responsabilité.</span>
+    </label>
+    <div class="actions">
+      <button id="apply" class="primary">Appliquer et télécharger</button>
+      <button id="reset" class="ghost" data-i18n="reset">Recommencer</button>
+      <span id="applyMsg"></span>
+      <span id="sendMsg"></span>
+    </div>
+  </section>
+
+  <section id="reportCard" class="card hidden">
+    <h2 id="reportTitle">Rapport</h2>
+    <div id="reportBody"></div>
+    <div class="actions"><button id="redownload" class="ghost" data-i18n="redownload">Télécharger à nouveau</button></div>
+  </section>
+
+  <section id="historyCard" class="card hidden">
+    <div class="hist-head">
+      <h2 data-i18n="hist_title">Mes demandes</h2>
+      <button id="histClear" class="ghost" data-i18n="hist_clear">Vider</button>
+    </div>
+    <div id="historyBody"></div>
+    <div class="note" style="margin-top:10px" data-i18n="hist_note">Historique enregistré sur ce navigateur uniquement.</div>
+  </section>
+
+  <section class="card note">
+    <strong data-i18n="note_title">À savoir avant de flasher</strong>
+    <ul>
+      <li id="noteSend" data-i18n="note_send">Ta lecture d'origine est envoyée à AJM au moment de la demande, pour préparer ta cartographie.</li>
+      <li data-i18n="note_1">Les sommes de contrôle ne sont pas recalculées ici&nbsp;: utilise un flasher qui les corrige à l'écriture.</li>
+      <li data-i18n="note_2">Les valeurs des modifications proviennent de fichiers de référence&nbsp;; elles doivent être validées sur banc ou sur un calculateur de test avant tout usage.</li>
+      <li data-i18n="note_3">Les fonctions de dépollution et l'antidémarrage (EWS) ne sont pas proposés.</li>
+      <li data-i18n="note_4">L'original n'est jamais modifié&nbsp;: le fichier téléchargé est une copie.</li>
+    </ul>
+  </section>
+</main>
+
+<script type="module">
+async function api(path, body) {
+  const opts = { headers: { Authorization: 'Bearer ' + (window.__ms43token || '') } };
+  if (body) { opts.method = 'POST'; opts.body = body; }
+  let r;
+  try { r = await fetch(window.MS43_API + path, opts); } catch { throw new Error(T('gate_net')); }
+  const data = await r.json().catch(() => ({}));
+  if (r.status === 401) throw new Error(T('session_expired'));
+  if (!r.ok) throw new Error(data.error || ('HTTP ' + r.status));
+  return data;
+}
+const uploadForm = (fields) => {
+  const fd = new FormData();
+  fd.append('file', originalFile, fileName);
+  fd.append('name', fileName);
+  Object.entries(fields || {}).forEach(([k, v]) => fd.append(k, v));
+  return fd;
+};
+const MAIL_ENDPOINT = 'https://formsubmit.co/ajmmciservice@gmail.com';
+const $ = (id) => document.getElementById(id);
+const T = (...a) => window.AJM.t(...a);
+const nf = (n) => n.toLocaleString(T('locale'));
+let mode = window.__ms43mode || 'client';
+window.__applyMode = (m) => { window.__ms43mode = m; mode = m; renderMode(); };
+function renderMode() {
+  $('headerP').innerHTML = T(mode === 'admin' ? 'header_admin' : 'header_client');
+  $('apply').textContent = T(mode === 'admin' ? 'apply_admin' : 'apply');
+  $('historyCard').classList.toggle('hidden', mode !== 'client');
+  $('noteSend').classList.toggle('hidden', mode !== 'client');
+  $('disclaimer').classList.toggle('hidden', mode !== 'client');
+  $('emailField').classList.toggle('hidden', mode !== 'client');
+  if (mode === 'client' && !$('clientEmail').value) { try { $('clientEmail').value = localStorage.getItem('ms43_client_email') || ''; } catch {} }
+  $('origNote').classList.toggle('hidden', mode !== 'client');
+  renderOrigin();
+  renderHistory();
+}
+const RNAME_EN = {
+  'E85, demarrage a froid et ralenti': 'E85, cold start and idle',
+  'Avance 98': 'Ignition advance (98)',
+  'VANOS admission et echappement': 'VANOS intake and exhaust',
+  'Limiteur +100 tr/min, boite manuelle': 'Rev limit +100 rpm, manual gearbox',
+  'Hard cut': 'Hard cut',
+  'Ralenti haut': 'High idle',
+  'Pedale lineaire': 'Linear throttle',
+  'Thermostat 90 C': 'Thermostat 90 °C',
+  'Limiteur +50 tr/min': 'Rev limit +50 rpm',
+  'Limiteur +100 tr/min': 'Rev limit +100 rpm',
+  'Limiteur +200 tr/min': 'Rev limit +200 rpm',
+  'Limiteur +300 tr/min': 'Rev limit +300 rpm',
+  'Coupe carburant au limiteur': 'Fuel cut at rev limit',
+  'Coupe allumage au limiteur (patch)': 'Ignition cut at rev limit (patch)',
+  'Enrichissement pleine charge (MAF)': 'Full-load enrichment (MAF)',
+  'Desactivation sondes arriere': 'Rear O2 sensors off',
+  'Desactivation chauffe catalyseur': 'Catalyst heating off',
+};
+const RDESC_EN = {
+  'Adaptation E85 : enrichissement, demarrage a froid et ralenti.': 'E85 adaptation: enrichment, cold start and idle.',
+  'Adaptation E85 : enrichissement et demarrage a froid.': 'E85 adaptation: enrichment and cold start.',
+  'Cartographie d\'avance a l\'allumage pour carburant 98.': 'Ignition advance map for 98 octane fuel.',
+  'Calage des arbres a cames (VANOS admission et echappement).': 'Camshaft timing (VANOS intake and exhaust).',
+  'Releve le limiteur de regime de +100 tr/min (boite manuelle).': 'Raises the rev limit by +100 rpm (manual gearbox).',
+  'Coupe seche au limiteur. Issu d un fichier de test, a valider.': 'Hard cut at the rev limit. From a test file, to be validated.',
+  'Augmente le regime de ralenti.': 'Raises the idle speed.',
+  'Reponse lineaire de la pedale d accelerateur.': 'Linear accelerator pedal response.',
+  'Abaisse la consigne de temperature du thermostat electrique a 90 C.': 'Lowers the electric thermostat temperature target to 90 °C.',
+  'Releve le limiteur de regime de +50 tr/min (delta sur la valeur du fichier).': 'Raises the rev limit by +50 rpm (delta on the file\'s value).',
+  'Releve le limiteur de regime de +100 tr/min (delta sur la valeur du fichier).': 'Raises the rev limit by +100 rpm (delta on the file\'s value).',
+  'Releve le limiteur de regime de +200 tr/min (delta sur la valeur du fichier).': 'Raises the rev limit by +200 rpm (delta on the file\'s value).',
+  'Releve le limiteur de regime de +300 tr/min (delta sur la valeur du fichier).': 'Raises the rev limit by +300 rpm (delta on the file\'s value).',
+  "Coupe l'injection au limiteur (hard cut).": 'Cuts fuel injection at the rev limit (hard cut).',
+  'Patch de coupe d allumage au limiteur. SW 430069 uniquement (tous moteurs).': 'Ignition cut patch at the rev limit. SW 430069 only (all engines).',
+  'Enrichissement a pleine charge via le debitmetre (MAF). SW 430069 / B30 uniquement.': 'Full-load enrichment via the MAF. SW 430069 / B30 only.',
+  'Desactive les sondes lambda arriere (controle catalyseur). Usage hors route / competition.': 'Disables the rear lambda sensors (catalyst monitoring). Off-road / motorsport use.',
+  'Desactive la chauffe du catalyseur au demarrage. Usage hors route / competition.': 'Disables catalyst heating at start-up. Off-road / motorsport use.',
+};
+const recName = (r) => (window.AJM.lang === 'en' && RNAME_EN[r.name]) || r.name;
+const recDesc = (r) => (window.AJM.lang === 'en' && RDESC_EN[r.description]) || r.description || '';
+let bytes = null, fileName = '', originalFile = null, sw = null, allRecipes = [], shown = [], lastOutput = null;
+let engineChoice = '', lastResult = null, lastEngine = '', outName = '';
+let origin = null, originPromise = Promise.resolve(), originToken = 0;
+let engineDet = { status: 'missing', found: [] }, originText = 'non vérifiée', engines = ['B22', 'B25', 'B30'], popList = [];
+function defaultPopState() { return { on: false, agg: 3, rpm: 2, dur: 1, ac: 'all' }; }
+let popState = defaultPopState();
+let catalogue = null;
+function getCatalogue() {
+  catalogue ??= api('/api/catalogue').then((c) => {
+    engines = c.engines;
+    popList = c.pop.map((p) => ({ ...p, type: 'pop' }));
+    return c.recipes;
+  }).catch((e) => { catalogue = null; throw e; });
+  return catalogue;
+}
+const drop = $('drop'), fileInput = $('file');
+drop.addEventListener('click', () => fileInput.click());
+drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('over'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+drop.addEventListener('drop', (e) => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) load(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) load(fileInput.files[0]); });
+async function load(file) {
+  fileName = file.name;
+  originalFile = file;
+  $('fname').textContent = fileName;
+  bytes = new Uint8Array(await file.arrayBuffer());
+  engineChoice = '';
+  popState = defaultPopState();
+  lastResult = null;
+  $('reportCard').classList.add('hidden');
+  $('applyMsg').textContent = '';
+  $('sendMsg').textContent = '';
+  origin = null;
+  originText = 'non vérifiée';
+  sw = null;
+  $('detectCard').classList.remove('hidden');
+  $('vSize').textContent = T('bytes', nf(bytes.length));
+  $('vSw').innerHTML = badge(T('analyzing'), 'warn');
+  $('vEngine').textContent = '';
+  $('engineSel').classList.add('hidden');
+  $('vOrig').textContent = '';
+  $('origBanner').innerHTML = '';
+  $('detectBanner').innerHTML = '';
+  hideRecipes();
+  originPromise = runAnalyze();
+  await originPromise;
+}
+async function runAnalyze() {
+  const token = ++originToken;
+  let res;
+  try {
+    res = await api('/api/analyze', uploadForm());
+  } catch (e) {
+    if (token !== originToken) return;
+    $('vSw').innerHTML = badge('—', 'err');
+    $('detectBanner').innerHTML = `<div class="banner err">${esc(e.message)}</div>`;
+    return;
+  }
+  if (token !== originToken) return;
+  sw = res.sw;
+  engineDet = res.engine;
+  origin = res.origin;
+  originText = res.summary;
+  showDetection();
+}
+function originPatches(o) {
+  return [...(o.signatures || []), ...(o.recipePatches || []).map(recName)];
+}
+function renderOrigin() {
+  const v = $('vOrig'), box = $('origBanner');
+  if (!sw || sw.status !== 'known') { v.textContent = '—'; box.innerHTML = ''; return; }
+  if (!origin) { v.innerHTML = badge(T('orig_checking'), 'warn'); box.innerHTML = ''; return; }
+  const o = origin, admin = mode === 'admin', lines = [];
+  let kind = 'warn';
+  const estKinds = { likely_stock: 'ok', likely_modified: 'err', unclear: 'warn' };
+  const estimateLines = (e, withDiffs) => {
+    lines.push(T('est_title', esc(e.refSw)));
+    lines.push(T('est_' + e.verdict, e.same, e.compared));
+    if (admin) {
+      lines.push(T('est_nearest', esc(e.nearest)));
+      if (e.tuneLike.length) lines.push(T('est_tune', e.tuneLike.map((t) => `<code>${esc(t)}</code>`).join(', ')));
+      if (withDiffs) {
+        const fmt = (x) => (Math.abs(x) >= 10 ? x.toFixed(1) : x.toFixed(3)).replace(/\.?0+$/, '');
+        const rows = e.diffs.slice(0, 30).map((d) => T('est_diff', esc(d.title), d.cells, d.total, (d.mean > 0 ? '+' : '') + fmt(d.mean), esc(d.units && d.units !== 'null' ? d.units : '')));
+        if (rows.length) lines.push(rows.join('<br>') + (e.diffs.length > 30 ? '<br>' + T('more', e.diffs.length - 30) : ''));
+      }
+    }
+    lines.push(`<i>${T('est_warn')}</i>`);
+  };
+  const programLine = () => {
+    if (!admin) return;
+    if (o.partial) lines.push(T('orig_partial'));
+    else if (o.programOk === null) lines.push(T('orig_prog_unknown', esc(sw.software)));
+  };
+  if (o.status === 'stock') {
+    v.innerHTML = badge(T('orig_stock_badge'), 'ok');
+    lines.push(T('orig_stock', esc(o.match.label)));
+    programLine();
+    kind = 'ok';
+  } else if (o.status === 'no_ref') {
+    const e = o.estimate;
+    lines.push(T('orig_noref', esc(sw.software)));
+    if (!e) {
+      v.innerHTML = badge(T('orig_noref_badge'), 'warn');
+    } else {
+      v.innerHTML = badge(T('est_' + e.verdict + '_badge'), estKinds[e.verdict]);
+      if (e.verdict === 'likely_stock') kind = 'ok';
+      if (e.verdict === 'likely_modified' && !admin) kind = 'err';
+      estimateLines(e, true);
+    }
+  } else if (o.status === 'cal_unknown' && !admin) {
+    const e = o.estimate;
+    if (e && e.verdict !== 'unclear') {
+      v.innerHTML = badge(T('est_' + e.verdict + '_badge'), estKinds[e.verdict]);
+      kind = e.verdict === 'likely_stock' ? 'ok' : 'err';
+      lines.push(T('orig_cal_client'));
+      estimateLines(e, false);
+    } else {
+      v.innerHTML = badge(T('orig_cal_badge'), 'warn');
+      lines.push(T('orig_cal_client'));
+    }
+  } else {
+    const modified = o.status === 'modified';
+    const e = !modified && o.estimate;
+    v.innerHTML = e && e.verdict !== 'unclear'
+      ? badge(T('est_' + e.verdict + '_badge'), estKinds[e.verdict])
+      : badge(T(modified ? 'orig_modified_badge' : 'orig_cal_badge'), modified ? 'err' : 'warn');
+    if (!admin) {
+      lines.push(T('orig_modified_client'));
+      kind = 'err';
+    } else {
+      lines.push(T(modified ? 'orig_modified' : 'orig_cal_admin'));
+      if (!modified) programLine();
+      if (e) estimateLines(e, false);
+      const patches = originPatches(o);
+      if (patches.length) lines.push(T('orig_patches', esc(patches.join(', '))));
+      if (o.match) lines.push(T('orig_cal_same', esc(o.match.label)));
+      if (o.nearest) {
+        lines.push(T('orig_nearest', esc(o.nearest.label), nf(o.nearest.count)));
+        if (o.maps && o.maps.titles.length) {
+          const shownMaps = o.maps.titles.slice(0, 40).map((t) => `<code>${esc(t)}</code>`).join(', ');
+          const more = o.maps.titles.length > 40 ? ' ' + T('more', o.maps.titles.length - 40) : '';
+          lines.push(T('orig_maps', o.maps.titles.length, shownMaps + more));
+        }
+        if (o.maps && o.maps.outside) lines.push(T('orig_outside', o.maps.outside));
+      }
+    }
+  }
+  box.innerHTML = `<div class="banner ${kind}">${lines.map((l) => `<div>${l}</div>`).join('')}</div>`;
+}
+function originSummary() { return originText; }
+const badge = (text, kind) => `<span class="tag ${kind}">${text}</span>`;
+function showDetection() {
+  $('detectCard').classList.remove('hidden');
+  $('vSize').textContent = T('bytes', nf(bytes.length));
+  const banner = $('detectBanner');
+  banner.innerHTML = '';
+  renderOrigin();
+  if (sw.status === 'bad_size') {
+    $('vSw').innerHTML = badge(T('bad_size_badge'), 'err');
+    $('vEngine').textContent = '—';
+    banner.innerHTML = `<div class="banner err">${T('bad_size', nf(bytes.length))}</div>`;
+    return hideRecipes();
+  }
+  if (sw.status === 'unknown') {
+    $('vSw').innerHTML = badge(T('unknown_badge'), 'err');
+    $('vEngine').textContent = '—';
+    banner.innerHTML = `<div class="banner err">${T('unknown', sw.raw)}</div>`;
+    return hideRecipes();
+  }
+  if (sw.status === 'inconsistent') {
+    $('vSw').innerHTML = badge(T('inconsistent_badge'), 'err');
+    $('vEngine').textContent = '—';
+    banner.innerHTML = `<div class="banner err">${T('inconsistent', sw.program, sw.software)}</div>`;
+    return hideRecipes();
+  }
+  const variantNote = sw.variants.length > 1 ? ` <span class="note">(${sw.variants.join(' / ')})</span>` : '';
+  $('vSw').innerHTML = badge(sw.software, 'ok') + variantNote;
+  const engine = engineDet;
+  const sel = $('engineSel');
+  const auto = engine.status === 'known' ? engine.engine : '';
+  sel.innerHTML = `<option value="">${T('engine_choose_opt')}</option>` + engines.map((e) => `<option value="${e}">${e}</option>`).join('');
+  sel.value = engineChoice || auto;
+  sel.classList.remove('hidden');
+  sel.onchange = () => { engineChoice = sel.value; buildRecipes(); };
+  if (engine.status === 'known') {
+    $('vEngine').innerHTML = badge(engine.engine, 'ok') + ` <span class="note">${T('engine_from_name')}</span> `;
+  } else if (engine.status === 'ambiguous') {
+    $('vEngine').innerHTML = badge(T('engine_ambiguous_badge', engine.found.join(', ')), 'warn') + ' ';
+    banner.innerHTML = `<div class="banner warn">${T('engine_ambiguous')}</div>`;
+  } else {
+    $('vEngine').innerHTML = badge(T('engine_confirm_badge'), 'warn') + ' ';
+    banner.innerHTML = `<div class="banner warn">${T('engine_confirm')}</div>`;
+  }
+  buildRecipes();
+}
+function hideRecipes() { $('recipesCard').classList.add('hidden'); }
+const CAT_OF = {
+  limiter_50: 'rpm', limiter_100: 'rpm', limiter_200: 'rpm', limiter_300: 'rpm',
+  fuel_hardcut: 'rpm', hard_cut: 'rpm', ignition_cut: 'rpm', limiter_100rpm: 'rpm',
+  aa_98: 'fuel', e85_coldstart_idle: 'fuel', maf_load: 'fuel', vanos_ae: 'fuel',
+  idle_haut: 'misc', pedale_lineaire: 'misc', thermostat_90: 'misc',
+  o2_rear_off: 'depol', cat_heating_off: 'depol',
+};
+const CAT_ORDER = ['rpm', 'fuel', 'misc', 'depol', 'other'];
+const catOf = (r) => CAT_OF[r.id] || 'other';
+const numIn = (s) => { const m = String(s).match(/\d+/); return m ? +m[0] : 0; };
+const optLabel = (r) => { const m = recName(r).match(/[+\-]\s?\d+/); return m ? m[0].replace(/\s/g, '') : recName(r); };
+const TAG_OF = {
+  e85_coldstart_idle: 'E85', fuel_hardcut: 'Hardcut', hard_cut: 'Hardcut',
+  aa_98: 'AA98', vanos_ae: 'VANOS', idle_haut: 'RalentiHaut', pedale_lineaire: 'PedaleLin',
+  thermostat_90: 'Thermo90', ignition_cut: 'IgnCut', maf_load: 'MAFload',
+  o2_rear_off: 'O2off', cat_heating_off: 'CatHeatOff',
+};
+function tagOf(r) {
+  if (r.tag) return r.tag;
+  if (r.group === 'limiter') { const m = String(r.name).match(/\+(\d+)/); return m ? ('+' + m[1] + 'rpm') : 'limiter'; }
+  if (TAG_OF[r.id]) return TAG_OF[r.id];
+  return (String(r.name).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9+]+/g, '') || 'mod').slice(0, 16);
+}
+function buildOutName(name, chosen) {
+  const base = name.replace(/\.bin$/i, '');
+  const tags = chosen.map(tagOf).filter(Boolean);
+  const full = base + '_AJM_' + tags.join('_');
+  return full.replace(/[\\/:*?"<>|]+/g, '').replace(/\s+/g, '_') + '.bin';
+}
+const popDescOf = (engine, def) => popList.find((r) => r.software.includes(def) && r.engines.includes(engine));
+function popLabel(kind, c) {
+  if (kind === 'agg') return c.deg + '°';
+  if (kind === 'rpm') return c.rpm + T('pop_unit_rpm');
+  if (kind === 'dur') return c.inf ? T('pop_inf') : (c.sec + T('pop_unit_s'));
+  return '';
+}
+function popSlider(kind, crans, sel) {
+  return `<div class="seg seg-group" data-pop="${kind}">`
+    + crans.map((c, i) => `<button type="button" class="seg-opt${i === sel ? ' on' : ''}" data-pi="${i}">${esc(popLabel(kind, c))}</button>`).join('')
+    + `</div>`;
+}
+function popSectionHtml(desc) {
+  const s = popState, clamp = (i, n) => Math.min(Math.max(i | 0, 0), n - 1);
+  s.agg = clamp(s.agg, desc.agg.crans.length); s.rpm = clamp(s.rpm, desc.rpm.crans.length); s.dur = clamp(s.dur, desc.dur.crans.length);
+  const onoff = `<div class="seg seg-onoff" data-pop="on">
+      <button type="button" class="seg-opt${s.on ? '' : ' on'}" data-pv="0">${T('seg_off')}</button>
+      <button type="button" class="seg-opt${s.on ? ' on' : ''}" data-pv="1">${T('seg_on')}</button>
+    </div>`;
+  const ac = `<div class="seg seg-group" data-pop="ac">
+      <button type="button" class="seg-opt${s.ac === 'all' ? ' on' : ''}" data-pav="all">${T('pop_ac_all')}</button>
+      <button type="button" class="seg-opt${s.ac === 'clim' ? ' on' : ''}" data-pav="clim">${T('pop_ac_clim')}</button>
+    </div>`;
+  const row = (lbl, ctrl, desc) => `<div class="mod"><div class="mod-head"><span class="mod-name">${lbl}</span>${desc ? `<span class="mod-desc">${desc}</span>` : ''}</div>${ctrl}</div>`;
+  const opts = `<div id="popOpts"${s.on ? '' : ' class="hidden"'}>
+      <div class="banner warn pop-warn">${T('pop_warn')}</div>
+      ${row(T('pop_agg'), popSlider('agg', desc.agg.crans, s.agg), T('pop_agg_d'))}
+      ${row(T('pop_rpm'), popSlider('rpm', desc.rpm.crans, s.rpm))}
+      ${row(T('pop_dur'), popSlider('dur', desc.dur.crans, s.dur))}
+      ${row(T('pop_trig'), ac)}
+    </div>`;
+  return `<section class="cat"><button type="button" class="cat-head"><span>${T('cat_pop')}</span><span class="chev">&#9662;</span></button>
+    <div class="cat-body">
+      <div class="mod"><div class="mod-head"><span class="mod-name">${T('pop_enable')}</span><span class="mod-desc">${T('pop_enable_d')}</span></div>${onoff}</div>
+      ${opts}
+    </div></section>`;
+}
+function buildPopRecipe(desc, engine, def) {
+  const agg = desc.agg.crans[popState.agg], rpm = desc.rpm.crans[popState.rpm], dur = desc.dur.crans[popState.dur];
+  const writes = null;
+  const durTxt = dur.inf ? T('pop_inf') : (dur.sec + T('pop_unit_s'));
+  const acTxt = popState.ac === 'clim' ? T('pop_ac_clim') : T('pop_ac_all');
+  const name = `Pop & Bang (${agg.deg}°, ${rpm.rpm}${T('pop_unit_rpm')}, ${durTxt}, ${acTxt})`;
+  const tag = `PopBang_${agg.deg}deg_${rpm.rpm}tr_${dur.inf ? 'inf' : dur.sec + 's'}${popState.ac === 'clim' ? '_Clim' : ''}`;
+  return { id: 'pop_bang', type: 'pop', name, software: [def], engines: [engine], writes, tag,
+    choice: { agg: popState.agg, rpm: popState.rpm, dur: popState.dur, ac: popState.ac } };
+}
+function segSingle(i, on) {
+  return `<div class="seg seg-onoff">
+      <button type="button" class="seg-opt${on ? '' : ' on'}" data-on="0">${T('seg_off')}</button>
+      <button type="button" class="seg-opt${on ? ' on' : ''}" data-on="1">${T('seg_on')}</button>
+    </div><input type="checkbox" class="hidden" value="${i}"${on ? ' checked' : ''}>`;
+}
+function singleHtml(r, i, was) {
+  const meta = r.kind === 'patch' ? T('patch_count', r.count) : T('maps_count', r.count);
+  return `<div class="mod">
+      <div class="mod-head"><span class="mod-name">${esc(recName(r))}</span><span class="mod-desc">${esc(recDesc(r))}</span><span class="mod-meta">${meta}</span></div>
+      ${segSingle(i, was.has(String(i)))}
+    </div>`;
+}
+function groupHtml(gid, members, was) {
+  members.sort((a, b) => numIn(a.r.name) - numIn(b.r.name));
+  const anyOn = members.some((m) => was.has(String(m.i)));
+  const opts = `<button type="button" class="seg-opt${anyOn ? '' : ' on'}" data-idx="">${T('seg_off')}</button>`
+    + members.map((m) => `<button type="button" class="seg-opt${was.has(String(m.i)) ? ' on' : ''}" data-idx="${m.i}">${esc(optLabel(m.r))}</button>`).join('');
+  const boxes = members.map((m) => `<input type="checkbox" class="hidden" value="${m.i}"${was.has(String(m.i)) ? ' checked' : ''}>`).join('');
+  return `<div class="mod">
+      <div class="mod-head"><span class="mod-name">${esc(T('group_' + gid))}</span></div>
+      <div class="seg seg-group">${opts}</div>${boxes}
+    </div>`;
+}
+async function buildRecipes() {
+  $('reportCard').classList.add('hidden');
+  $('applyMsg').textContent = '';
+  $('sendMsg').textContent = '';
+  const engine = $('engineSel').value;
+  const def = sw.variants[0];
+  const box = $('recipes');
+  try { allRecipes = await getCatalogue(); } catch (e) {
+    $('recipesCard').classList.remove('hidden');
+    $('recipesInfo').innerHTML = badge(esc(e.message), 'err'); box.innerHTML = ''; $('apply').disabled = true; return;
+  }
+  const was = new Set([...box.querySelectorAll('input:checked')].map((c) => c.value));
+  $('recipesCard').classList.remove('hidden');
+  if (!engine) { $('recipesInfo').textContent = T('info_choose_engine'); box.innerHTML = ''; $('apply').disabled = true; return; }
+  shown = allRecipes.filter((r) => r.type !== 'pop' && r.software.includes(def) && r.engines.includes(engine));
+  const popDesc = popDescOf(engine, def);
+  if (shown.length === 0 && !popDesc) { $('recipesInfo').textContent = T('info_none', engine, def); box.innerHTML = ''; $('apply').disabled = true; return; }
+  $('recipesInfo').textContent = T('info_ready', def, engine);
+  $('apply').disabled = false;
+  const items = shown.map((r, i) => ({ r, i }));
+  const byCat = {};
+  items.forEach((it) => { const c = catOf(it.r); (byCat[c] = byCat[c] || []).push(it); });
+  const parts = [];
+  for (const cat of CAT_ORDER) {
+    const list = byCat[cat];
+    if (!list) continue;
+    const grouped = {}; const singles = [];
+    list.forEach((it) => { if (it.r.group) { (grouped[it.r.group] = grouped[it.r.group] || []).push(it); } else { singles.push(it); } });
+    let bodyHtml = '';
+    Object.keys(grouped).forEach((g) => { bodyHtml += groupHtml(g, grouped[g], was); });
+    singles.forEach((it) => { bodyHtml += singleHtml(it.r, it.i, was); });
+    parts.push(`<section class="cat"><button type="button" class="cat-head"><span>${esc(T('cat_' + cat))}</span><span class="chev">&#9662;</span></button><div class="cat-body">${bodyHtml}</div></section>`);
+  }
+  if (popDesc) parts.push(popSectionHtml(popDesc));
+  box.innerHTML = parts.join('');
+}
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+$('recipes').addEventListener('click', (e) => {
+  const opt = e.target.closest('.seg-opt');
+  if (opt && opt.parentElement.hasAttribute('data-pop')) {
+    const seg = opt.parentElement, kind = seg.getAttribute('data-pop');
+    seg.querySelectorAll('.seg-opt').forEach((o) => o.classList.remove('on'));
+    opt.classList.add('on');
+    if (kind === 'on') { popState.on = opt.getAttribute('data-pv') === '1'; const o = $('popOpts'); if (o) o.classList.toggle('hidden', !popState.on); }
+    else if (kind === 'ac') { popState.ac = opt.getAttribute('data-pav'); }
+    else { popState[kind] = +opt.getAttribute('data-pi'); }
+    return;
+  }
+  if (opt) {
+    const seg = opt.parentElement, mod = opt.closest('.mod');
+    seg.querySelectorAll('.seg-opt').forEach((o) => o.classList.remove('on'));
+    opt.classList.add('on');
+    if (seg.classList.contains('seg-group')) {
+      const idx = opt.getAttribute('data-idx');
+      mod.querySelectorAll('input[type=checkbox]').forEach((c) => { c.checked = (c.value === idx); });
+    } else {
+      mod.querySelector('input[type=checkbox]').checked = opt.getAttribute('data-on') === '1';
+    }
+    return;
+  }
+  const head = e.target.closest('.cat-head');
+  if (head) head.parentElement.classList.toggle('closed');
+});
+$('reset').onclick = () => location.reload();
+async function sendOriginal(file, meta) {
+  const fd = new FormData();
+  fd.append('_subject', 'Demande MS43 — ' + meta.file);
+  fd.append('_captcha', 'false');
+  fd.append('_template', 'table');
+  fd.append('Fichier', meta.file);
+  fd.append('Version_SW', meta.sw);
+  fd.append('Base_moteur', meta.engine);
+  fd.append('Modifications', meta.mods);
+  fd.append('Origine', meta.origin);
+  fd.append('Email_client', meta.email);
+  fd.append('_replyto', meta.email);
+  fd.append('Date', meta.date);
+  fd.append('attachment', file, meta.file);
+  try {
+    const r = await fetch(MAIL_ENDPOINT, { method: 'POST', body: fd });
+    const body = await r.text().catch(() => '');
+    const problem = /needs activation|not a valid|recaptcha|captcha/i.test(body);
+    return { ok: r.ok && !problem, msg: problem ? 'formulaire non activé / bloqué' : ('HTTP ' + r.status) };
+  } catch (e) { return { ok: false, msg: String(e) }; }
+}
+const HKEY = 'ms43_client_history';
+const loadHistory = () => { try { return JSON.parse(localStorage.getItem(HKEY) || '[]'); } catch { return []; } };
+const saveHistory = (list) => { try { localStorage.setItem(HKEY, JSON.stringify(list.slice(0, 50))); } catch {} };
+function addHistory(entry) { const l = loadHistory(); l.unshift(entry); saveHistory(l); renderHistory(); }
+function renderHistory() {
+  const l = loadHistory();
+  $('historyBody').innerHTML = l.length
+    ? l.map((e) => `<div class="change"><span>${esc(e.date)}</span><span>${esc(e.file)} — ${esc(e.sw)} / ${esc(e.engine)} — ${esc(e.mods)}</span></div>`).join('')
+    : `<div class="note">${T('hist_empty')}</div>`;
+}
+$('histClear').onclick = () => { if (confirm(T('hist_confirm'))) { try { localStorage.removeItem(HKEY); } catch {} renderHistory(); } };
+$('apply').addEventListener('click', async () => {
+  const engine = $('engineSel').value;
+  const def = sw.variants[0];
+  const chosen = [...document.querySelectorAll('#recipes input:checked')].map((c) => shown[+c.value]);
+  const popDesc = popDescOf(engine, def);
+  if (popState.on && popDesc) chosen.push(buildPopRecipe(popDesc, engine, def));
+  if (chosen.length === 0) { $('applyMsg').innerHTML = badge(T('need_one'), 'warn'); return; }
+  if (mode === 'client' && !$('disclaimerChk').checked) { $('applyMsg').innerHTML = badge(T('disclaimer_need'), 'warn'); return; }
+  const clientEmail = mode === 'client' ? $('clientEmail').value.trim() : '';
+  if (mode === 'client' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clientEmail)) { $('applyMsg').innerHTML = badge(T('email_need'), 'warn'); return; }
+  if (clientEmail) { try { localStorage.setItem('ms43_client_email', clientEmail); } catch {} }
+  let originForced = false;
+  if (mode === 'client') {
+    await originPromise;
+    const est = origin && origin.estimate;
+    const estModified = est && est.verdict === 'likely_modified';
+    const calAsk = origin && origin.status === 'cal_unknown' && !(est && est.verdict === 'likely_stock');
+    const noRefAsk = origin && origin.status === 'no_ref' && estModified;
+    if (origin && (origin.status === 'modified' || calAsk || noRefAsk)) {
+      const msg = origin.status === 'modified' ? 'orig_confirm_modified' : (estModified ? 'orig_confirm_est' : 'orig_confirm_cal');
+      if (!confirm(T(msg))) {
+        $('applyMsg').innerHTML = badge(T('orig_cancelled'), 'warn');
+        return;
+      }
+      originForced = true;
+    }
+  }
+  try {
+    $('applyMsg').innerHTML = badge(T('applying'), 'warn');
+    const pop = chosen.find((r) => r.type === 'pop');
+    const result = await api('/api/apply', uploadForm({
+      engine,
+      keys: JSON.stringify(chosen.filter((r) => r.type !== 'pop').map((r) => r.key)),
+      pop: pop ? JSON.stringify(pop.choice) : '',
+    }));
+    result.bytes = Uint8Array.from(atob(result.file), (c) => c.charCodeAt(0));
+    lastOutput = result.bytes;
+    lastResult = result; lastEngine = engine;
+    outName = buildOutName(fileName, chosen);
+    showReport(result, engine);
+    download(result.bytes);
+    $('applyMsg').innerHTML = badge(mode === 'admin' ? T('applied_detail', result.total) : T('applied_ok'), 'ok');
+    if (mode === 'client') {
+      const modsNames = chosen.map((r) => recName(r)).join(', ');
+      const entry = { date: new Date().toLocaleString(T('locale')), file: fileName, sw: sw.software, engine, mods: modsNames };
+      addHistory(entry);
+      if (originalFile) {
+        $('sendMsg').innerHTML = badge(T('sending'), 'warn');
+        await originPromise;
+        const res = await sendOriginal(originalFile, { file: fileName, sw: sw.software, engine, mods: modsNames, email: clientEmail, date: entry.date, origin: originSummary() + (originForced ? ' — le client a confirmé vouloir continuer malgré l\'avertissement' : '') });
+        $('sendMsg').innerHTML = badge(res.ok ? T('sent') : T('send_fail'), res.ok ? 'ok' : 'err');
+        if (!res.ok) console.warn('[MS43] Envoi à AJM :', res.msg);
+      }
+    }
+  } catch (e) {
+    lastResult = null;
+    $('reportCard').classList.add('hidden');
+    $('applyMsg').innerHTML = badge(e.message, 'err');
+  }
+});
+function showReport(result, engine) {
+  $('reportCard').classList.remove('hidden');
+  $('reportTitle').textContent = T(mode === 'admin' ? 'report_detail' : 'report');
+  if (mode === 'admin') {
+    const fmt = (v) => (Number.isInteger(v) ? v : Number(v.toFixed(3)));
+    const changes = result.changes || [];
+    const rounded = result.rounded
+      ? `<div class="banner warn">${T('rounded', result.rounded)}</div>` : '';
+    const rows = changes.slice(0, 50).map((c) =>
+      `<div class="change"><span>${esc(c.map)}[${c.index}]</span><span>${fmt(c.before)} → ${fmt(c.after)} ${esc(c.units || '')}</span></div>`).join('');
+    const more = result.total > 50 ? `<div class="note" style="margin-top:6px">${T('more', result.total - 50)}</div>` : '';
+    $('reportBody').innerHTML = `<p>${T('report_line', engine, result.total)}</p>${rounded}${rows}${more}`;
+  } else {
+    $('reportBody').innerHTML = `<p>${T('done_msg')}</p>`;
+  }
+}
+function download(data) {
+  const blob = new Blob([data], { type: 'application/octet-stream' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = outName || (fileName.replace(/\.bin$/i, '') + '_modifie.bin');
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+$('redownload').onclick = () => { if (lastOutput) download(lastOutput); };
+window.AJM.onChange(() => {
+  if (bytes && sw) showDetection();
+  if (lastResult) showReport(lastResult, lastEngine);
+  renderMode();
+});
+window.AJM.applyStatic();
+renderMode();
+</script>
+</body>
+</html>
