@@ -496,7 +496,6 @@ const uploadForm = (fields) => {
   Object.entries(fields || {}).forEach(([k, v]) => fd.append(k, v));
   return fd;
 };
-const MAIL_ENDPOINT = 'https://formsubmit.co/ajmmciservice@gmail.com';
 const $ = (id) => document.getElementById(id);
 const T = (...a) => window.AJM.t(...a);
 const nf = (n) => n.toLocaleString(T('locale'));
@@ -916,27 +915,8 @@ $('recipes').addEventListener('click', (e) => {
   if (head) head.parentElement.classList.toggle('closed');
 });
 $('reset').onclick = () => location.reload();
-async function sendOriginal(file, meta) {
-  const fd = new FormData();
-  fd.append('_subject', 'Demande MS43 — ' + meta.file);
-  fd.append('_captcha', 'false');
-  fd.append('_template', 'table');
-  fd.append('Fichier', meta.file);
-  fd.append('Version_SW', meta.sw);
-  fd.append('Base_moteur', meta.engine);
-  fd.append('Modifications', meta.mods);
-  fd.append('Origine', meta.origin);
-  fd.append('Email_client', meta.email);
-  fd.append('_replyto', meta.email);
-  fd.append('Date', meta.date);
-  fd.append('attachment', file, meta.file);
-  try {
-    const r = await fetch(MAIL_ENDPOINT, { method: 'POST', body: fd });
-    const body = await r.text().catch(() => '');
-    const problem = /needs activation|not a valid|recaptcha|captcha/i.test(body);
-    return { ok: r.ok && !problem, msg: problem ? 'formulaire non activé / bloqué' : ('HTTP ' + r.status) };
-  } catch (e) { return { ok: false, msg: String(e) }; }
-}
+// L'envoi de la lecture d'origine à AJM est désormais fait par le serveur (Worker : archive R2 + e-mail),
+// à l'application des modifications. Le navigateur n'envoie plus rien à un service tiers.
 const HKEY = 'ms43_client_history';
 const loadHistory = () => { try { return JSON.parse(localStorage.getItem(HKEY) || '[]'); } catch { return []; } };
 const saveHistory = (list) => { try { localStorage.setItem(HKEY, JSON.stringify(list.slice(0, 50))); } catch {} };
@@ -978,10 +958,15 @@ $('apply').addEventListener('click', async () => {
   try {
     $('applyMsg').innerHTML = badge(T('applying'), 'warn');
     const pop = chosen.find((r) => r.type === 'pop');
+    const modsNames = chosen.map((r) => recName(r)).join(', ');
+    // Mode client : on joint l'e-mail du client, les modifs et le résumé d'origine pour la notification serveur.
     const result = await api('/api/apply', uploadForm({
       engine,
       keys: JSON.stringify(chosen.filter((r) => r.type !== 'pop').map((r) => r.key)),
       pop: pop ? JSON.stringify(pop.choice) : '',
+      email: clientEmail,
+      mods: modsNames,
+      origin: originSummary() + (originForced ? ' — le client a confirmé vouloir continuer malgré l\'avertissement' : ''),
     }));
     result.bytes = Uint8Array.from(atob(result.file), (c) => c.charCodeAt(0));
     lastOutput = result.bytes;
@@ -991,16 +976,9 @@ $('apply').addEventListener('click', async () => {
     download(result.bytes);
     $('applyMsg').innerHTML = badge(mode === 'admin' ? T('applied_detail', result.total) : T('applied_ok'), 'ok');
     if (mode === 'client') {
-      const modsNames = chosen.map((r) => recName(r)).join(', ');
-      const entry = { date: new Date().toLocaleString(T('locale')), file: fileName, sw: sw.software, engine, mods: modsNames };
-      addHistory(entry);
-      if (originalFile) {
-        $('sendMsg').innerHTML = badge(T('sending'), 'warn');
-        await originPromise;
-        const res = await sendOriginal(originalFile, { file: fileName, sw: sw.software, engine, mods: modsNames, email: clientEmail, date: entry.date, origin: originSummary() + (originForced ? ' — le client a confirmé vouloir continuer malgré l\'avertissement' : '') });
-        $('sendMsg').innerHTML = badge(res.ok ? T('sent') : T('send_fail'), res.ok ? 'ok' : 'err');
-        if (!res.ok) console.warn('[MS43] Envoi à AJM :', res.msg);
-      }
+      addHistory({ date: new Date().toLocaleString(T('locale')), file: fileName, sw: sw.software, engine, mods: modsNames });
+      // notified = AJM a bien reçu la demande (e-mail et/ou archive serveur).
+      $('sendMsg').innerHTML = badge(result.notified ? T('sent') : T('send_fail'), result.notified ? 'ok' : 'err');
     }
   } catch (e) {
     lastResult = null;
