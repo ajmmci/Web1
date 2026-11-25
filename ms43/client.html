@@ -849,13 +849,12 @@ function singleHtml(r, i, was) {
 function groupHtml(gid, members, was) {
   members.sort((a, b) => numIn(a.r.name) - numIn(b.r.name));
   const anyOn = members.some((m) => was.has(String(m.i)));
-  const opts = `<button type="button" class="seg-opt${anyOn ? '' : ' on'}" data-idx="">${T('seg_off')}</button>`
-    + members.map((m) => `<button type="button" class="seg-opt${was.has(String(m.i)) ? ' on' : ''}" data-idx="${m.i}">${esc(optLabel(m.r))}</button>`).join('');
+  const opts = `<button type="button" class="seg-opt${anyOn ? '' : ' on'}" data-idx="" data-desc="">${T('seg_off')}</button>`
+    + members.map((m) => `<button type="button" class="seg-opt${was.has(String(m.i)) ? ' on' : ''}" data-idx="${m.i}" data-desc="${esc(recDesc(m.r))}">${esc(optLabel(m.r))}</button>`).join('');
   const boxes = members.map((m) => `<input type="checkbox" class="hidden" value="${m.i}"${was.has(String(m.i)) ? ' checked' : ''}>`).join('');
-  const note = T('group_' + gid + '_note');
-  const noteHtml = (note && typeof note === 'string') ? `<span class="mod-desc">${note}</span>` : '';
+  const sel = members.find((m) => was.has(String(m.i))); // description du niveau choisi (maj au clic)
   return `<div class="mod">
-      <div class="mod-head"><span class="mod-name">${esc(T('group_' + gid))}</span>${noteHtml}</div>
+      <div class="mod-head"><span class="mod-name">${esc(T('group_' + gid))}</span><span class="mod-desc" data-gdesc>${esc(sel ? recDesc(sel.r) : '')}</span></div>
       <div class="seg seg-group">${opts}</div>${boxes}
     </div>`;
 }
@@ -914,6 +913,8 @@ $('recipes').addEventListener('click', (e) => {
     if (seg.classList.contains('seg-group')) {
       const idx = opt.getAttribute('data-idx');
       mod.querySelectorAll('input[type=checkbox]').forEach((c) => { c.checked = (c.value === idx); });
+      const gd = mod.querySelector('[data-gdesc]'); // affiche la description du niveau choisi
+      if (gd) gd.textContent = opt.getAttribute('data-desc') || '';
     } else {
       mod.querySelector('input[type=checkbox]').checked = opt.getAttribute('data-on') === '1';
     }
