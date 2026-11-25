@@ -124,6 +124,8 @@ window.AJM = (function () {
       s3: 'Modifications',
       seg_off: 'Off', seg_on: 'On',
       group_limiter: 'Régime max',
+      group_e85: 'E85 — enrichissement',
+      group_e85_note: 'Plus le % est élevé, plus c\'est riche. 21 % : trop pauvre en Full E85 (plutôt pour un mélange E85 + essence). 29 % : trop riche s\'il reste de l\'essence dans le réservoir (plutôt Full E85). 25 % : intermédiaire.',
       cat_rpm: 'Régime & limiteur', cat_fuel: 'Carburant & moteur', cat_misc: 'Confort & divers', cat_depol: 'Dépollution (hors route)', cat_other: 'Divers',
       cat_pop: 'Pop & Bang (hors route)',
       pop_enable: 'Activer le Pop & Bang', pop_enable_d: 'Pétarades à l\'échappement en levant le pied.',
@@ -242,6 +244,8 @@ window.AJM = (function () {
       s3: 'Modifications',
       seg_off: 'Off', seg_on: 'On',
       group_limiter: 'Rev limit',
+      group_e85: 'E85 — enrichment',
+      group_e85_note: 'Higher % = richer. 21%: too lean on full E85 (rather for an E85 + petrol mix). 29%: too rich if petrol remains in the tank (rather full E85). 25%: in between.',
       cat_rpm: 'Rev limit & cut', cat_fuel: 'Fuel & engine', cat_misc: 'Comfort & misc', cat_depol: 'Emissions (off-road)', cat_other: 'Other',
       cat_pop: 'Pop & Bang (off-road)',
       pop_enable: 'Enable Pop & Bang', pop_enable_d: 'Exhaust crackle when you lift off.',
@@ -755,6 +759,7 @@ const CAT_OF = {
   limiter_50: 'rpm', limiter_100: 'rpm', limiter_200: 'rpm', limiter_300: 'rpm',
   fuel_hardcut: 'rpm', hard_cut: 'rpm', ignition_cut: 'rpm', limiter_100rpm: 'rpm',
   aa_98: 'fuel', e85_coldstart_idle: 'fuel', maf_load: 'fuel', vanos_ae: 'fuel',
+  e85_21: 'fuel', e85_25: 'fuel', e85_29: 'fuel', coldstart: 'fuel', richesse: 'fuel',
   idle_haut: 'misc', pedale_lineaire: 'misc', thermostat_90: 'misc',
   o2_rear_off: 'depol', cat_heating_off: 'depol',
 };
@@ -765,6 +770,7 @@ const optLabel = (r) => { const m = recName(r).match(/[+\-]\s?\d+/); return m ? 
 const TAG_OF = {
   e85_coldstart_idle: 'E85', fuel_hardcut: 'Hardcut', hard_cut: 'Hardcut',
   aa_98: 'AA98', vanos_ae: 'VANOS', idle_haut: 'RalentiHaut', pedale_lineaire: 'PedaleLin',
+  coldstart: 'Coldstart', richesse: 'RichessePC', e85_21: 'E85-21', e85_25: 'E85-25', e85_29: 'E85-29',
   thermostat_90: 'Thermo90', ignition_cut: 'IgnCut', maf_load: 'MAFload',
   o2_rear_off: 'O2off', cat_heating_off: 'CatHeatOff',
 };
@@ -846,8 +852,10 @@ function groupHtml(gid, members, was) {
   const opts = `<button type="button" class="seg-opt${anyOn ? '' : ' on'}" data-idx="">${T('seg_off')}</button>`
     + members.map((m) => `<button type="button" class="seg-opt${was.has(String(m.i)) ? ' on' : ''}" data-idx="${m.i}">${esc(optLabel(m.r))}</button>`).join('');
   const boxes = members.map((m) => `<input type="checkbox" class="hidden" value="${m.i}"${was.has(String(m.i)) ? ' checked' : ''}>`).join('');
+  const note = T('group_' + gid + '_note');
+  const noteHtml = (note && typeof note === 'string') ? `<span class="mod-desc">${note}</span>` : '';
   return `<div class="mod">
-      <div class="mod-head"><span class="mod-name">${esc(T('group_' + gid))}</span></div>
+      <div class="mod-head"><span class="mod-name">${esc(T('group_' + gid))}</span>${noteHtml}</div>
       <div class="seg seg-group">${opts}</div>${boxes}
     </div>`;
 }
